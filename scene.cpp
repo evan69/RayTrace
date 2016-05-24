@@ -110,11 +110,13 @@ void Scene::init()
 	m_Primitive[2]->getMaterial()->setDiffuse( 0.1f );
 	m_Primitive[2]->getMaterial()->setColor( Color( 0.7f, 0.7f, 1.0f ) );
 	// light source 1
+	//m_Primitive[3] = new Sphere( vector3( 0, 5, 5 ), 0.1f );
 	m_Primitive[3] = new Sphere( vector3( 0, 5, 5 ), 0.1f );
 	m_Primitive[3]->Light( true );
 	m_Primitive[3]->getMaterial()->setColor( Color( 0.4f, 0.4f, 0.4f ) );
 	// light source 2
-	m_Primitive[4] = new Sphere( vector3( -3, 5, 1 ), 0.1f );
+	//m_Primitive[4] = new Sphere( vector3( -3, 5, 1 ), 0.1f );
+	m_Primitive[4] = new Sphere( vector3( -3, 5, 1 ), 1.0f );
 	m_Primitive[4]->Light( true );
 	m_Primitive[4]->getMaterial()->setColor( Color( 0.6f, 0.6f, 0.8f ) );
 	// extra sphere
@@ -192,16 +194,16 @@ void Scene::BuildGrid()
 	double dx = (p2.x - p1.x) / GRIDSIZE, dx_reci = 1.0f / dx;
 	double dy = (p2.y - p1.y) / GRIDSIZE, dy_reci = 1.0f / dy;
 	double dz = (p2.z - p1.z) / GRIDSIZE, dz_reci = 1.0f / dz;
-	m_Boundary = aabb( p1, p2 - p1 );
+	m_Boundary = BoundingBox( p1, p2 - p1 );
 	m_Light = new Primitive*[MAXLIGHTS];
 	m_Lights = 0;
 	// store primitives in the grid cells
 	for ( int p = 0; p < m_Primitives; p++ )
 	{
 		if (m_Primitive[p]->IsLight()) m_Light[m_Lights++] = m_Primitive[p];
-		aabb bound = m_Primitive[p]->getAABB();
+		BoundingBox bound = m_Primitive[p]->getAABB();
 		vector3 bv1 = bound.getPos(), bv2 = bound.getPos() + bound.getSize();
-		// find out which cells could contain the primitive (based on aabb)
+		// find out which cells could contain the primitive (based on BoundingBox)
 		int x1 = (int)((bv1.x - p1.x) * dx_reci), x2 = (int)((bv2.x - p1.x) * dx_reci) + 1;
 		x1 = (x1 < 0)?0:x1, x2 = (x2 > (GRIDSIZE - 1))?GRIDSIZE - 1:x2;
 		int y1 = (int)((bv1.y - p1.y) * dy_reci), y2 = (int)((bv2.y - p1.y) * dy_reci) + 1;
@@ -213,11 +215,11 @@ void Scene::BuildGrid()
 			for ( int y = y1; y < y2; y++ ) 
 				for ( int z = z1; z < z2; z++ )
 		{
-			// construct aabb for current cell
+			// construct BoundingBox for current cell
 			int idx = x + y * GRIDSIZE + z * GRIDSIZE * GRIDSIZE;
 			vector3 pos( p1.x + x * dx, p1.y + y * dy, p1.z + z * dz );
-			aabb cell( pos, vector3( dx, dy, dz ) );
-			// do an accurate aabb / primitive intersection test
+			BoundingBox cell( pos, vector3( dx, dy, dz ) );
+			// do an accurate BoundingBox / primitive intersection test
 			if (m_Primitive[p]->H_IntersectBox( cell ))
 			{
 				m_Grid[idx].push_back(m_Primitive[p]);

@@ -24,13 +24,13 @@ void Engine::setTarget()
 	m_CW = m_Scene->getBoundary().getSize() * (1.0f / GRIDSIZE);//单位gird长度
 }
 
-int Engine::FindNearest( Ray& a_Ray, double& a_Dist, Primitive*& a_Prim )
+int Engine::FindNearest( Ray& p_Ray, double& p_Dist, Primitive*& p_Prim )
 {
 	int retval = MISS;
 	vector3 raydir, curpos;
-	aabb e = m_Scene->getBoundary();
-	curpos = a_Ray.getOrigin();
-	raydir = a_Ray.getDirection();
+	BoundingBox e = m_Scene->getBoundary();
+	curpos = p_Ray.getOrigin();
+	raydir = p_Ray.getDirection();
 	// setup 3DDDA (double check reusability of primary ray data)
 	vector3 cb, tmax, tdelta, cell;
 	cell = (curpos - e.getPos()) * m_SR;
@@ -96,7 +96,7 @@ int Engine::FindNearest( Ray& a_Ray, double& a_Dist, Primitive*& a_Prim )
 	std::vector<Primitive*> list;
 	//std::vector<Primitive*>* grid = m_Scene->getGrid();
 	auto grid = m_Scene->getGrid();
-	a_Prim = 0;
+	p_Prim = 0;
 	// trace primary ray
 	while (1)
 	{
@@ -107,11 +107,11 @@ int Engine::FindNearest( Ray& a_Ray, double& a_Dist, Primitive*& a_Prim )
 			//Primitive* pr = list->getPrimitive();
 			Primitive* pr = list[list_index];
 			int result;
-			//if (pr->getLastRayID() != a_Ray.getID()) 
-				if (result = pr->Intersect( a_Ray, a_Dist )) 
+			//if (pr->getLastRayID() != p_Ray.getID()) 
+				if (result = pr->Intersect( p_Ray, p_Dist )) 
 			{
 				retval = result;
-				a_Prim = pr;
+				p_Prim = pr;
 				goto testloop;
 			}
 			//list = list->getNext();
@@ -159,10 +159,10 @@ testloop:
 			//Primitive* pr = list->getPrimitive();
 			Primitive* pr = list[list_index];
 			int result;
-			//if (pr->getLastRayID() != a_Ray.getID()) 
-				if (result = pr->Intersect( a_Ray, a_Dist )) 
+			//if (pr->getLastRayID() != p_Ray.getID()) 
+				if (result = pr->Intersect( p_Ray, p_Dist )) 
 			{
-				a_Prim = pr;
+				p_Prim = pr;
 				retval = result;
 			}
 			//list = list->getNext();
@@ -172,14 +172,14 @@ testloop:
 		{
 			if (tmax.x < tmax.z)
 			{
-				if (a_Dist < tmax.x) break;
+				if (p_Dist < tmax.x) break;
 				X = X + stepX;
 				if (X == outX) break;
 				tmax.x += tdelta.x;
 			}
 			else
 			{
-				if (a_Dist < tmax.z) break;
+				if (p_Dist < tmax.z) break;
 				Z = Z + stepZ;
 				if (Z == outZ) break;
 				tmax.z += tdelta.z;
@@ -189,14 +189,14 @@ testloop:
 		{
 			if (tmax.y < tmax.z)
 			{
-				if (a_Dist < tmax.y) break;
+				if (p_Dist < tmax.y) break;
 				Y = Y + stepY;
 				if (Y == outY) break;
 				tmax.y += tdelta.y;
 			}
 			else
 			{
-				if (a_Dist < tmax.z) break;
+				if (p_Dist < tmax.z) break;
 				Z = Z + stepZ;
 				if (Z == outZ) break;
 				tmax.z += tdelta.z;
@@ -204,6 +204,42 @@ testloop:
 		}
 	}
 	return retval;
+}
+
+double Engine::calShade(Primitive* p_Light, vector3 p_pi, vector3& p_Dir)
+{
+	
+	//vector3 delta = vector3();
+	double shade = 1.0;
+	Primitive* prim = 0;
+	if(p_Light->getType() == Primitive::SPHERE)
+	{
+		int max_R = 3,max_C = 5;
+		Sphere* light = (Sphere*)p_Light;
+		vector3 O = light->getCentre();
+		p_Dir = O - p_pi;
+		NORMALIZE(p_Dir);
+		double R = light->getRadius();
+		for(int i = 0;i < max_R;++i)
+			for(int j = 0;j < max_C;++j)
+			{
+				vector3 d = vector3(std::cos(2 * j * PI / max_C),0.0,std::sin(2 * j * PI / max_C));
+				vector3 pos = O + R / (max_R - 1) * i * d;
+				vector3 dir = pos - p_pi;
+				double dist = LENGTH(dir);
+				NORMALIZE(dir);
+				if (FindNearest( Ray( p_pi + dir * EPS, dir), dist, prim ))
+					if (prim == p_Light) shade += 1.0;
+			}
+		shade = shade / (max_R * max_C);
+		
+	}
+	if(p_Light->getType() == Primitive::BOX)
+	{
+
+	}
+	//printf("%llf\n",shade);
+	return shade;
 }
 
 Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Refr_Rate, double& p_Dist )
@@ -256,6 +292,7 @@ Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Re
 				Primitive* light = p;
 				// handle point light source
 				double shade = 1.0;
+				/*
 				if (light->getType() == Primitive::SPHERE)//球形光源
 				{
 					vector3 L = ((Sphere*)light)->getCentre() - pi;
@@ -263,19 +300,27 @@ Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Re
 					//L *= (1.0 / tdist);//L单位化
 					NORMALIZE(L);
 					Ray r = Ray( pi + L * EPS, L );//从光线与物体交点到该光源的Ray r
-					for ( int s = 0; s < m_Scene->getNrPrimitives(); s++ )//检查光线r
-					{
-						Primitive* pr = m_Scene->getPrimitive( s );
-						if ((pr != light) && (pr->Intersect( r, tdist )))//如果r和某一个非光源物体相交
-						{
-							shade = 0;//则该光源在该处被遮挡，置标记为0
-							break;
-						}
-					}
+					///*
+					//for ( int s = 0; s < m_Scene->getNrPrimitives(); s++ )//检查光线r
+					//{
+					//	Primitive* pr = m_Scene->getPrimitive( s );
+					//	if ((pr != light) && (pr->Intersect( r, tdist )))//如果r和某一个非光源物体相交
+					//	{
+					//		shade = 0;//则该光源在该处被遮挡，置标记为0
+					//		break;
+					//	}
+					//}
+					//
+					Primitive* pr;
+					FindNearest(r,tdist,pr);
+					if(pr != light) shade = 0.0;
 				}
+				*/
+				vector3 L;
+				shade = calShade(light,pi,L);
 				// calculate diffuse shading
-				vector3 L = ((Sphere*)light)->getCentre() - pi;
-				NORMALIZE( L );
+				//vector3 L = ((Sphere*)light)->getCentre() - pi;
+				//NORMALIZE( L );
 				vector3 N = prim->getNormal( pi );//物体在pi处的法向量
 				if (prim->getMaterial()->getDiffuse() > 0)//漫反射
 				{

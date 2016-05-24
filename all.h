@@ -34,15 +34,15 @@ namespace HYF
 
 #define PI				3.141592653589793238462f
 
-class aabb
+class BoundingBox
 {
 public:
-	aabb() : m_Pos( vector3( 0, 0, 0 ) ), m_Size( vector3( 0, 0, 0 ) ) {};
-	aabb( vector3& a_Pos, vector3& a_Size ) : m_Pos( a_Pos ), m_Size( a_Size ) {};
+	BoundingBox() : m_Pos( vector3( 0, 0, 0 ) ), m_Size( vector3( 0, 0, 0 ) ) {};
+	BoundingBox( vector3& p_Pos, vector3& p_Size ) : m_Pos( p_Pos ), m_Size( p_Size ) {};
 	//pos-三个向量维度最小值 size三个维度尺寸
 	vector3& getPos() { return m_Pos; }
 	vector3& getSize() { return m_Size; }
-	bool Intersect( aabb& b2 )
+	bool Intersect( BoundingBox& b2 )
 	{
 		vector3 v1 = b2.getPos(), v2 = b2.getPos() + b2.getSize();
 		vector3 v3 = m_Pos, v4 = m_Pos + m_Size;
@@ -50,12 +50,12 @@ public:
 				(v4.y > v1.y) && (v3.y < v2.y) && // y-axis overlap
 				(v4.z > v1.z) && (v3.z < v2.z));   // z-axis overlap
 	}
-	bool Contains( vector3 a_Pos )
+	bool Contains( vector3 p_Pos )
 	{
 		vector3 v1 = m_Pos, v2 = m_Pos + m_Size;
-		return ((a_Pos.x > (v1.x - EPS)) && (a_Pos.x < (v2.x + EPS)) &&
-				(a_Pos.y > (v1.y - EPS)) && (a_Pos.y < (v2.y + EPS)) &&
-				(a_Pos.z > (v1.z - EPS)) && (a_Pos.z < (v2.z + EPS)));
+		return ((p_Pos.x > (v1.x - EPS)) && (p_Pos.x < (v2.x + EPS)) &&
+				(p_Pos.y > (v1.y - EPS)) && (p_Pos.y < (v2.y + EPS)) &&
+				(p_Pos.z > (v1.z - EPS)) && (p_Pos.z < (v2.z + EPS)));
 	}
 private:
 	vector3 m_Pos, m_Size;
@@ -67,6 +67,7 @@ typedef vector3 Color;
 
 #include "ray.h"
 #include "primitive.h"
+#include "box.h"
 #include "sphere.h"
 #include "plane.h"
 #include "scene.h"

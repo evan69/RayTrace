@@ -38,7 +38,7 @@ public:
 	{
 		SPHERE = 1,
 		PLANE = 2,
-		AABB
+		BOX = 3
 	};
 	Primitive() : m_Name( 0 ), m_Light( false ) {};
 	Material* getMaterial() { return &m_Material; }
@@ -46,11 +46,11 @@ public:
 
 	virtual int getType() = 0;
 	virtual int Intersect( Ray& p_Ray, double& p_Dist ) = 0;
-	virtual bool H_IntersectBox( aabb& ) = 0;
+	virtual bool H_IntersectBox( BoundingBox& ) = 0;
 	virtual vector3 getNormal( vector3& p_Pos ) = 0;
 	virtual Color getColor() { return m_Material.getColor(); }
 	virtual void Light( bool p_Light ) { m_Light = p_Light; }
-	virtual aabb getAABB() = 0;
+	virtual BoundingBox getAABB() = 0;
 	
 	bool IsLight() { return m_Light; }
 	void setName( char* p_Name );

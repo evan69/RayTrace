@@ -30,9 +30,9 @@ public:
 	vector3& getNormal() { return m_Plane.N; }
 	double getD() { return m_Plane.D; }
 	int Intersect( Ray& p_Ray, double& p_Dist );
-	bool H_IntersectBox( aabb& );
+	bool H_IntersectBox( BoundingBox& );
 	vector3 getNormal( vector3& p_Pos ){return m_Plane.N;};
-	aabb getAABB() { return aabb(vector3(-10000,-10000,-10000),vector3(20000,20000,20000));}
+	BoundingBox getAABB() { return BoundingBox(vector3(-10000,-10000,-10000),vector3(20000,20000,20000));}
 
 private:
 	plane m_Plane;

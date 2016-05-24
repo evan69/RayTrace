@@ -39,7 +39,7 @@ int Sphere::Intersect( Ray& p_Ray, double& p_Dist )
 
 
 
-bool Sphere::H_IntersectBox(aabb& p_b)
+bool Sphere::H_IntersectBox(BoundingBox& p_b)
 {
 	double dmin = 0;
 	vector3 v1 = p_b.getPos(), v2 = p_b.getPos() + p_b.getSize();

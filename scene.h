@@ -17,11 +17,11 @@ public:
 	int getNrLights() {return m_Lights;}
 	Primitive* getPrimitive( int p_Idx ) { return m_Primitive[p_Idx]; }
 	Primitive* getLight(int p_Idx) { return m_Light[p_Idx];}
-	aabb& getBoundary() {return m_Boundary;}
+	BoundingBox& getBoundary() {return m_Boundary;}
 private:
 	int m_Primitives,m_Lights;
 	Primitive** m_Primitive,**m_Light;
-	aabb m_Boundary;
+	BoundingBox m_Boundary;
 	std::vector<Primitive*>* m_Grid;
 };
 

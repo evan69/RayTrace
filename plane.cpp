@@ -21,7 +21,7 @@ int PlanePrim::Intersect( Ray& p_Ray, double& p_Dist )
 	return MISS;
 }
 
-bool PlanePrim::H_IntersectBox(aabb& p_b)
+bool PlanePrim::H_IntersectBox(BoundingBox& p_b)
 {
 	vector3 pos = p_b.getPos();
 	vector3 size = p_b.getSize();
@@ -44,10 +44,10 @@ bool PlanePrim::H_IntersectBox(aabb& p_b)
 	else return true;
 }
 /*
-bool PlanePrim::H_IntersectBox( aabb& a_Box )
+bool PlanePrim::H_IntersectBox( BoundingBox& p_Box )
 {
 	vector3 v[2];
-	v[0] = a_Box.getPos(), v[1] = a_Box.getPos() + a_Box.getSize();
+	v[0] = p_Box.getPos(), v[1] = p_Box.getPos() + p_Box.getSize();
 	int side1,side2,i;
 	for ( side1 = 0, side2 = 0, i = 0; i < 8; i++ )
 	{

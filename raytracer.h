@@ -16,7 +16,8 @@ public:
 	Scene* getScene() { return m_Scene; }
 	Primitive* Runtracer( Ray& p_Ray, Color& p_Acc, int p_Depth, double p_RIndex, double& p_Dist );
 	bool HYF_render(cv::Mat&);
-	int FindNearest(Ray& a_Ray, double& a_Dist, Primitive*& a_Prim);
+	double calShade(Primitive* p_Light, vector3 p_pi, vector3& p_Dir);
+	int FindNearest(Ray& p_Ray, double& p_Dist, Primitive*& p_Prim);
 protected:
 	Scene* m_Scene;
 	int m_Width, m_Height;
