@@ -6,6 +6,7 @@ Mat colorim(600,800,CV_8UC3);
 
 int main()
 {
+	srand(time(NULL));
 	HYF::Engine* tracer = new HYF::Engine();
 	tracer->getScene()->init();
 	tracer->setTarget();

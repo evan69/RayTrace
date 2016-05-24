@@ -13,28 +13,28 @@ Box::Box( BoundingBox& p_Box ) :
 {
 }
 
-int Box::Intersect( Ray& p_Ray, float& p_Dist )
+int Box::Intersect( Ray& p_Ray, double& p_Dist )
 {
-	float dist[6];
+	double dist[6];
 	vector3 ip[6], d = p_Ray.getDirection(), o = p_Ray.getOrigin();
 	bool retval = MISS;
 	for ( int i = 0; i < 6; i++ ) dist[i] = -1;
 	vector3 v1 = m_Box.getPos(), v2 = m_Box.getPos() + getSize();
 	if (d.x) 
 	{
-		float rc = 1.0f / d.x;
+		double rc = 1.0f / d.x;
 		dist[0] = (v1.x - o.x) * rc;
 		dist[3] = (v2.x - o.x) * rc;
 	}
 	if (d.y) 
 	{
-		float rc = 1.0f / d.y;
+		double rc = 1.0f / d.y;
 		dist[1] = (v1.y - o.y) * rc;
 		dist[4] = (v2.y - o.y) * rc;
 	}
 	if (d.z) 
 	{
-		float rc = 1.0f / d.z;
+		double rc = 1.0f / d.z;
 		dist[2] = (v1.z - o.z) * rc;
 		dist[5] = (v2.z - o.z) * rc;
 	}
@@ -57,15 +57,15 @@ int Box::Intersect( Ray& p_Ray, float& p_Dist )
 
 vector3 Box::getNormal( vector3& p_Pos )
 {
-	float dist[6];
-	dist[0] = (float)fabs( m_Box.getSize().x - m_Box.getPos().x );
-	dist[1] = (float)fabs( m_Box.getSize().x + m_Box.getSize().x - m_Box.getPos().x );
-	dist[2] = (float)fabs( m_Box.getSize().y - m_Box.getPos().y );
-	dist[3] = (float)fabs( m_Box.getSize().y + m_Box.getSize().y - m_Box.getPos().y );
-	dist[4] = (float)fabs( m_Box.getSize().z - m_Box.getPos().z );
-	dist[5] = (float)fabs( m_Box.getSize().z + m_Box.getSize().z - m_Box.getPos().z );
+	double dist[6];
+	dist[0] = (double)fabs( m_Box.getSize().x - m_Box.getPos().x );
+	dist[1] = (double)fabs( m_Box.getSize().x + m_Box.getSize().x - m_Box.getPos().x );
+	dist[2] = (double)fabs( m_Box.getSize().y - m_Box.getPos().y );
+	dist[3] = (double)fabs( m_Box.getSize().y + m_Box.getSize().y - m_Box.getPos().y );
+	dist[4] = (double)fabs( m_Box.getSize().z - m_Box.getPos().z );
+	dist[5] = (double)fabs( m_Box.getSize().z + m_Box.getSize().z - m_Box.getPos().z );
 	int best = 0;
-	float bdist = dist[0];
+	double bdist = dist[0];
 	for ( int i = 1 ; i < 6; i++ ) if (dist[i] < bdist) 
 	{ 
 		bdist = dist[i]; 

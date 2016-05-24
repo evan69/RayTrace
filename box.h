@@ -9,11 +9,11 @@ namespace HYF
 class Box : public Primitive
 {
 public:
-	int GetType() { return BOX; }
+	int getType() { return BOX; }
 	Box();
 	Box( BoundingBox& p_Box );
-	int Intersect( Ray& p_Ray, float& p_Dist );
-	bool IntersectBox( BoundingBox& p_Box ) { return m_Box.Intersect( p_Box ); }
+	int Intersect( Ray& p_Ray, double& p_Dist );
+	bool H_IntersectBox( BoundingBox& p_Box ) { return m_Box.Intersect( p_Box ); }
 	vector3 getNormal( vector3& );
 	bool Contains( vector3& p_Pos ) { return m_Box.Contains( p_Pos ); }
 	vector3& getPos() { return m_Box.getPos(); }

@@ -32,7 +32,7 @@ public:
 	int Intersect( Ray& p_Ray, double& p_Dist );
 	bool H_IntersectBox( BoundingBox& );
 	vector3 getNormal( vector3& p_Pos ){return m_Plane.N;};
-	BoundingBox getAABB() { return BoundingBox(vector3(-10000,-10000,-10000),vector3(20000,20000,20000));}
+	BoundingBox getBoundingBox() { return BoundingBox(vector3(-10000,-10000,-10000),vector3(20000,20000,20000));}
 
 private:
 	plane m_Plane;

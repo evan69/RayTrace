@@ -15,16 +15,19 @@ public:
 	void setSpecular( double p_Spec ) { m_Spec = p_Spec; }//高光
 	void setDiffuse( double p_Diff ) { m_Diff = p_Diff; }
 	void setReflection( double p_Refl ) { m_Refl = p_Refl; }
+	void setDiffRefl(double p_DiffRefl ) { m_DiffRefl = p_DiffRefl; }
 	void setRefraction( double p_Refr ) { m_Refr = p_Refr; }
 	void setRefr_Rate( double p_Refr_Rate ) { m_Refr_Rate = p_Refr_Rate; }
 	double getSpecular() { return m_Spec; }//高光
 	double getDiffuse() { return m_Diff; }//漫反射
 	double getReflection() { return m_Refl;}
+	double getDiffRefl() { return m_DiffRefl;}
 	double getRefraction() { return m_Refr;}
 	double getRefr_Rate() { return m_Refr_Rate;}
 private:
 	Color m_Color;//材质颜色
 	double m_Refl;//反射系数
+	double m_DiffRefl;//漫镜面反射系数
 	double m_Diff;//漫反射系数
 	double m_Spec;//高光
 	double m_Refr;//透射率
@@ -50,7 +53,7 @@ public:
 	virtual vector3 getNormal( vector3& p_Pos ) = 0;
 	virtual Color getColor() { return m_Material.getColor(); }
 	virtual void Light( bool p_Light ) { m_Light = p_Light; }
-	virtual BoundingBox getAABB() = 0;
+	virtual BoundingBox getBoundingBox() = 0;
 	
 	bool IsLight() { return m_Light; }
 	void setName( char* p_Name );

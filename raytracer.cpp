@@ -210,16 +210,23 @@ double Engine::calShade(Primitive* p_Light, vector3 p_pi, vector3& p_Dir)
 {
 	
 	//vector3 delta = vector3();
-	double shade = 1.0;
+	double shade = 0.0;
 	Primitive* prim = 0;
 	if(p_Light->getType() == Primitive::SPHERE)
 	{
-		int max_R = 3,max_C = 5;
+		//int max_R = 2,max_C = 1;
 		Sphere* light = (Sphere*)p_Light;
 		vector3 O = light->getCentre();
 		p_Dir = O - p_pi;
 		NORMALIZE(p_Dir);
 		double R = light->getRadius();
+		vector3 dir = O - p_pi;
+		double dist = LENGTH(dir);
+		NORMALIZE(dir);
+		if (FindNearest( Ray( p_pi + dir * EPS, dir), dist, prim ))
+			if (prim == p_Light) 
+				shade += 1.0;
+		/*
 		for(int i = 0;i < max_R;++i)
 			for(int j = 0;j < max_C;++j)
 			{
@@ -229,14 +236,49 @@ double Engine::calShade(Primitive* p_Light, vector3 p_pi, vector3& p_Dir)
 				double dist = LENGTH(dir);
 				NORMALIZE(dir);
 				if (FindNearest( Ray( p_pi + dir * EPS, dir), dist, prim ))
-					if (prim == p_Light) shade += 1.0;
+					if (prim == p_Light) shade += (1.0 / (max_R * max_C));
 			}
-		shade = shade / (max_R * max_C);
-		
+		*/
 	}
-	if(p_Light->getType() == Primitive::BOX)
+	else if(p_Light->getType() == Primitive::BOX)
 	{
-
+		//printf("box\n");
+		shade = 0.0;
+		int max_X = 10,max_Z = 10;
+		Box* light = (Box*)p_Light;
+		vector3 P = light->getPos();
+		vector3 size = light->getSize();
+		p_Dir = P + 0.5 * size - p_pi;
+		NORMALIZE(p_Dir);
+		for(int i = 0;i < max_X;++i)
+			for(int j = 0;j < max_Z;++j)
+			{
+				vector3 d = vector3(size.x / max_X,0.0,size.z / max_Z);
+				//printf("%llf,%llf,%llf\n",d.x,d.y,d.z);
+				vector3 pos = P + vector3(d.x * (i + (double)rand() / RAND_MAX),0.0,d.z * (j + (double)rand() / RAND_MAX));
+				//monte carlo 
+				vector3 dir = pos - p_pi;
+				double dist = LENGTH(dir);
+				NORMALIZE(dir);
+				if (FindNearest( Ray( p_pi + dir * EPS, dir), dist, prim ))
+					if (prim == p_Light) 
+						shade += (1.0 / (max_X * max_Z));
+			}
+		/*
+		shade = 0;
+		Box* b = (Box*)p_Light;
+		p_Dir = (b->getPos() + 0.5f * b->getSize()) - p_pi;
+		NORMALIZE( p_Dir );
+		for ( int x = 0; x < 3; x++ ) for ( int y = 0; y < 3; y++ )
+		{
+			vector3 lp( b->getPos().x + x, b->getPos().y, b->getPos().z + y );
+			vector3 dir = lp - p_pi;
+			double ldist = (double)LENGTH( dir );
+			dir *= 1.0f / ldist;
+			if (FindNearest( Ray( p_pi + dir * EPS, dir), ldist, prim ))
+				if (prim == p_Light) shade += 1.0f / 9;
+		}
+		*/
 	}
 	//printf("%llf\n",shade);
 	return shade;
@@ -264,8 +306,6 @@ Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Re
 	}
 	*/
 	if (!(result = FindNearest( p_Ray, p_Dist, prim ))) return 0;
-	//result = FindNearest( p_Ray, p_Dist, prim );
-	//printf("%llf\n",p_Dist);
 	//计算一根光线Ray最近的交汇点和距离
 	// no hit, terminate ray
 	if (!prim) return 0;//光线不和任何物体相交
@@ -356,9 +396,35 @@ Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Re
 		double refl = prim->getMaterial()->getReflection();
 		if (refl > 0.0)//镜面反射
 		{
+			float drefl = prim->getMaterial()->getDiffRefl();
 			vector3 N = prim->getNormal( pi );
 			vector3 R = p_Ray.getDirection() - 2.0 * DOT( p_Ray.getDirection(), N ) * N;
-			if (p_Depth < TRACEDEPTH) 
+			if ((drefl > 0) && (p_Depth < 2))//粗糙镜面反射
+			{
+				vector3 component1 = vector3( R.z, 0.0, -R.x );
+				vector3 component2 = R.Cross( component1 );
+				NORMALIZE(component2);
+				int num = 20;
+				//refl *= m_SScale;
+				for ( int i = 0; i < num; i++ )
+				{
+					double x0,y0;
+					while(1)
+					{
+						x0 = (double)rand() / RAND_MAX * drefl;
+						y0 = (double)rand() / RAND_MAX * drefl;
+						if((x0 * x0 + y0 * y0) < (drefl * drefl))
+							break;
+					}
+					vector3 newR = R + component1 * x0 + component2 * y0;
+					NORMALIZE( newR );
+					double dist;
+					Color rcol( 0, 0, 0 );
+					Runtracer( Ray( pi + newR * EPS, newR ), rcol, p_Depth + 1, p_Refr_Rate, dist );
+					p_Col += refl * rcol * prim->getMaterial()->getColor() * (1.0 / (double)num);
+				}
+			}
+			else if (p_Depth < TRACEDEPTH)//光滑镜面反射
 			{
 				Color rcol( 0, 0, 0 );
 				double dist;
@@ -399,7 +465,7 @@ Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Re
 	return prim;
 }
 
-//#define SUPERSAMPLING
+#define SUPERSAMPLING
 bool Engine::HYF_render(cv::Mat& colorim)
 {
 	vector3 o( 0, 0, -5 );
@@ -415,7 +481,7 @@ bool Engine::HYF_render(cv::Mat& colorim)
 			for(double i = -1.0;i < 1.5;++i)
 				for(double j = -1.0;j < 1.5;++j)
 				{
-					vector3 dir = vector3( (1.0 * x + i / 3) / 100 - 3.0 , (1.0 * y + j / 3) / 100 - 3.0, 0 ) - o;
+					vector3 dir = vector3( (1.0 * x + i / 3) / 100 - 4.0 , (1.0 * y + j / 3) / 100 - 3.0, 0 ) - o;
 					NORMALIZE( dir );
 					Ray r( o, dir );
 					double dist;
@@ -427,7 +493,7 @@ bool Engine::HYF_render(cv::Mat& colorim)
 			//super sampling
 #endif
 #ifndef SUPERSAMPLING
-			vector3 dir = vector3( (1.0 * x) / 100 - 3.0 , (1.0 * y) / 100 - 3.0, 0 ) - o;
+			vector3 dir = vector3( (1.0 * x) / 100 - 4.0 , (1.0 * y) / 100 - 3.0, 0 ) - o;
 			NORMALIZE( dir );
 			Ray r( o, dir );
 			double dist;
@@ -441,7 +507,7 @@ bool Engine::HYF_render(cv::Mat& colorim)
 			if (blue > 255) blue = 255;
 			colorim.at<Vec3b>(m_Height - y - 1,x) = Vec3b(blue,green,red);
 		}
-		//printf("rendering %dth row...\n",y+1);
+		printf("rendering %dth row...\n",y+1);
 		//imshow("test",colorim);
 		//waitKey(0);
 	}

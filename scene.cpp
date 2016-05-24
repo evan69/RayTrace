@@ -8,9 +8,11 @@ Scene::~Scene()
 	delete m_Primitive;
 }
 
+#define SCENE_CORNELLBOX
 void Scene::init()
 {
-	/*
+	m_Primitive = 0;
+#ifdef SCENE_4
 	m_Primitive = new Primitive*[100];
 	// ground plane
 	m_Primitive[0] = new PlanePrim( vector3( 0, 1, 0 ), 4.4f );
@@ -84,8 +86,8 @@ void Scene::init()
 	}
 	// set number of primitives
 	m_Primitives = prim;
-	*/
-	
+#endif
+#ifdef SCENE_5
 	m_Primitive = new Primitive*[500];
 	// ground plane
 	m_Primitive[0] = new PlanePrim( vector3( 0, 1, 0 ), 4.4f );
@@ -111,13 +113,15 @@ void Scene::init()
 	m_Primitive[2]->getMaterial()->setColor( Color( 0.7f, 0.7f, 1.0f ) );
 	// light source 1
 	//m_Primitive[3] = new Sphere( vector3( 0, 5, 5 ), 0.1f );
-	m_Primitive[3] = new Sphere( vector3( 0, 5, 5 ), 0.1f );
+	//m_Primitive[3] = new Sphere( vector3( 0, 5, 5 ), 0.1f );
+	m_Primitive[3] = new Box( BoundingBox(vector3( -2.0, 5, 3.0 ), vector3(4,0.1,4) ));
 	m_Primitive[3]->Light( true );
-	m_Primitive[3]->getMaterial()->setColor( Color( 0.4f, 0.4f, 0.4f ) );
+	//m_Primitive[3]->getMaterial()->setColor( Color( 0.4f, 0.4f, 0.4f ) );
+	m_Primitive[3]->getMaterial()->setColor( Color( 1.0f, 1.0f, 1.0f ) );
 	// light source 2
 	//m_Primitive[4] = new Sphere( vector3( -3, 5, 1 ), 0.1f );
 	m_Primitive[4] = new Sphere( vector3( -3, 5, 1 ), 1.0f );
-	m_Primitive[4]->Light( true );
+	//m_Primitive[4]->Light( true );
 	m_Primitive[4]->getMaterial()->setColor( Color( 0.6f, 0.6f, 0.8f ) );
 	// extra sphere
 	m_Primitive[5] = new Sphere( vector3( -1.5f, -3.8f, 1 ), 1.5f );
@@ -143,6 +147,7 @@ void Scene::init()
 	m_Primitive[7]->getMaterial()->setColor( Color( 0.4f, 0.7f, 0.7f ) );
 	// grid
 	int prim = 8;
+	
 	for ( int x = 0; x < 8; x++ ) for ( int y = 0; y < 7; y++ )
 	{
 		m_Primitive[prim] = new Sphere( vector3( -4.5f + x * 1.5f, -4.3f + y * 1.5f, 10 ), 0.3f );
@@ -176,10 +181,105 @@ void Scene::init()
 		m_Primitive[prim]->getMaterial()->setColor( Color( 0.3f, 1.0f, 0.4f ) );
 		prim++;
 	}
+	
 	// set number of primitives
 	m_Primitives = prim;
 	// build the regular gird
+#endif
+#ifdef SCENE_CORNELLBOX
+	m_Primitive = new Primitive*[500];
+	// ground plane
+	m_Primitive[0] = new PlanePrim( vector3( 0, 1, 0 ), 4.4f );
+	m_Primitive[0]->setName( "plane" );
+	m_Primitive[0]->getMaterial()->setReflection( 0.0f );
+	m_Primitive[0]->getMaterial()->setSpecular(0.8f);
+	m_Primitive[0]->getMaterial()->setRefraction( 0.0f );
+	m_Primitive[0]->getMaterial()->setDiffuse( 1.0f );
+	m_Primitive[0]->getMaterial()->setColor( Color( 0.2f, 0.2f, 0.2f ) );
+	// big sphere
+	m_Primitive[1] = new Sphere( vector3( 0, -1.7f, 7 ), 2.5 );
+	m_Primitive[1]->setName( "big sphere" );
+	m_Primitive[1]->getMaterial()->setReflection( 0.3f );
+	m_Primitive[1]->getMaterial()->setRefraction( 0.9f );
+	m_Primitive[1]->getMaterial()->setRefr_Rate( 1.3f );
+	m_Primitive[1]->getMaterial()->setColor( Color( 0.7f, 0.7f, 1.0f ) );
+	//m_Primitive[1]->getMaterial()->setDiffRefl( 0.3f );
+	// small sphere
+	m_Primitive[2] = new Sphere( vector3( -6, -3.7f, 5 ), 0.7 );
+	m_Primitive[2]->setName( "small sphere" );
+	m_Primitive[2]->getMaterial()->setReflection( 0.8f );
+	m_Primitive[2]->getMaterial()->setRefraction( 0.0f );
+	m_Primitive[2]->getMaterial()->setRefr_Rate( 1.3f );
+	m_Primitive[2]->getMaterial()->setDiffuse( 0.1f );
+	m_Primitive[2]->getMaterial()->setColor( Color( 0.7f, 0.7f, 1.0f ) );
+	m_Primitive[2]->getMaterial()->setDiffRefl( 0.3f );
+	// third sphere
+	m_Primitive[3] = new Sphere( vector3( 4, -3.2f, 7 ), 1 );
+	m_Primitive[3]->setName( "small sphere" );
+	m_Primitive[3]->getMaterial()->setReflection( 0.5f );
+	m_Primitive[3]->getMaterial()->setRefraction( 0.01f );
+	m_Primitive[3]->getMaterial()->setRefr_Rate( 1.3f );
+	m_Primitive[3]->getMaterial()->setDiffuse( 0.1f );
+	m_Primitive[3]->getMaterial()->setColor( Color( 0.7f, 0.7f, 1.0f ) );
+	m_Primitive[2]->getMaterial()->setDiffRefl( 0.1f );
+#if 1
+	// area light
+	m_Primitive[4] = new Box( BoundingBox( vector3( -1, 5, 4 ), vector3( 2, 0.1f, 2 ) ) );
+	m_Primitive[4]->Light( true );
+	m_Primitive[4]->getMaterial()->setColor( Color( 1, 1, 1 ) );
+#else
+	// light source 1
+	m_Primitive[4] = new Sphere( vector3( 0, 5, 5 ), 0.1f );
+	m_Primitive[4]->Light( true );
+	m_Primitive[4]->getMaterial()->setColor( Color( 1, 1, 1 ) );
+#endif
+	// back plane
+	m_Primitive[5] = new PlanePrim( vector3( 0, 0, -1 ), 12.4f );
+	m_Primitive[5]->setName( "backplane" );
+	m_Primitive[5]->getMaterial()->setSpecular(0.8f);
+	m_Primitive[5]->getMaterial()->setReflection( 0.0f );
+	m_Primitive[5]->getMaterial()->setRefraction( 0.0f );
+	m_Primitive[5]->getMaterial()->setDiffuse( 1.0f );
+	m_Primitive[5]->getMaterial()->setColor( Color( 0.4f, 0.3f, 0.3f ) );
+	// ceiling
+	m_Primitive[6] = new PlanePrim( vector3( 0, -1, 0), 5.2f);
+	m_Primitive[6]->setName( "ceiling" );
+	m_Primitive[6]->getMaterial()->setSpecular(0.8f);
+	m_Primitive[6]->getMaterial()->setReflection( 0.0f );
+	m_Primitive[6]->getMaterial()->setRefraction( 0.0f );
+	m_Primitive[6]->getMaterial()->setDiffuse( 1.0f );
+	m_Primitive[6]->getMaterial()->setColor( Color( 0.2f, 0.2f, 0.2f ) );
+	/*
+	m_Primitive[7] = new Sphere( vector3( 0, 5, 5 ), 0.1f );
+	m_Primitive[7]->Light( true );
+	m_Primitive[7]->getMaterial()->setColor( Color( 1, 1, 1 ) );
+	*/
+	m_Primitive[7] = new PlanePrim( vector3( 1, 0, 0), 7.0f);
+	m_Primitive[7]->setName( "right plane" );
+	m_Primitive[7]->getMaterial()->setSpecular(0.8f);
+	m_Primitive[7]->getMaterial()->setReflection( 0.0f );
+	m_Primitive[7]->getMaterial()->setRefraction( 0.0f );
+	m_Primitive[7]->getMaterial()->setDiffuse( 2.0f );
+	m_Primitive[7]->getMaterial()->setColor( Color( 0.2f, 0.0f, 0.0f ) );
 	
+	m_Primitive[8] = new PlanePrim( vector3( -1, 0, 0), 7.0f);
+	m_Primitive[8]->setName( "left plane" );
+	m_Primitive[8]->getMaterial()->setSpecular(0.8f);
+	m_Primitive[8]->getMaterial()->setReflection( 0.0f );
+	m_Primitive[8]->getMaterial()->setRefraction( 0.0f );
+	m_Primitive[8]->getMaterial()->setDiffuse( 2.0f );
+	m_Primitive[8]->getMaterial()->setColor( Color( 0.0f, 0.0f, 0.2f ) );
+	
+	m_Primitive[9] = new PlanePrim( vector3( 0, 0, 1 ), 6.0f );
+	m_Primitive[9]->setName( "backplane2" );
+	m_Primitive[9]->getMaterial()->setSpecular(0.8f);
+	m_Primitive[9]->getMaterial()->setReflection( 0.0f );
+	m_Primitive[9]->getMaterial()->setRefraction( 0.0f );
+	m_Primitive[9]->getMaterial()->setDiffuse( 1.0f );
+	m_Primitive[9]->getMaterial()->setColor( Color( 0.0f, 0.2f, 0.0f ) );
+
+	m_Primitives = 10;
+#endif
 	BuildGrid();
 }
 
@@ -189,7 +289,7 @@ void Scene::BuildGrid()
 	m_Grid = new vector<Primitive*>[GRIDSIZE * GRIDSIZE * GRIDSIZE];
 	memset( m_Grid, 0, GRIDSIZE * GRIDSIZE * GRIDSIZE * 4 );
 	//vector3 p1(-14, -5, -6), p2( 14, 8, 30 );
-	vector3 p1(-20, -20, -20), p2( 20, 20, 30 );
+	vector3 p1(-20, -20, -20), p2( 20, 20, 20 );
 	// calculate cell width, height and depth
 	double dx = (p2.x - p1.x) / GRIDSIZE, dx_reci = 1.0f / dx;
 	double dy = (p2.y - p1.y) / GRIDSIZE, dy_reci = 1.0f / dy;
@@ -201,7 +301,7 @@ void Scene::BuildGrid()
 	for ( int p = 0; p < m_Primitives; p++ )
 	{
 		if (m_Primitive[p]->IsLight()) m_Light[m_Lights++] = m_Primitive[p];
-		BoundingBox bound = m_Primitive[p]->getAABB();
+		BoundingBox bound = m_Primitive[p]->getBoundingBox();
 		vector3 bv1 = bound.getPos(), bv2 = bound.getPos() + bound.getSize();
 		// find out which cells could contain the primitive (based on BoundingBox)
 		int x1 = (int)((bv1.x - p1.x) * dx_reci), x2 = (int)((bv2.x - p1.x) * dx_reci) + 1;

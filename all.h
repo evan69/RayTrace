@@ -4,6 +4,7 @@
 #include <opencv2\opencv.hpp>
 #include <cmath>
 #include <cstdlib>
+#include <ctime>
 #include <vector>
 #include "vector3.h"
 
