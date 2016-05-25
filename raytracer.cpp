@@ -465,7 +465,7 @@ Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Re
 	return prim;
 }
 
-#define SUPERSAMPLING
+//#define SUPERSAMPLING
 bool Engine::HYF_render(cv::Mat& colorim)
 {
 	vector3 o( 0, 0, -5 );
