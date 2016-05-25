@@ -14,8 +14,8 @@ public:
 	double getSqRadius() { return m_SqRadius; }
 	int Intersect( Ray& p_Ray, double& p_Dist );
 	bool H_IntersectBox(BoundingBox&);
-	vector3 getNormal( vector3& p_Pos ) { return (p_Pos - m_Centre) * m_RRadius; }
-	BoundingBox getBoundingBox()
+	inline vector3 getNormal( vector3& p_Pos ) { return (p_Pos - m_Centre) * m_RRadius; }
+	inline BoundingBox getBoundingBox()
 	{
 		vector3 vecR(m_Radius,m_Radius,m_Radius);
 		return BoundingBox(m_Centre - vecR,2*vecR);

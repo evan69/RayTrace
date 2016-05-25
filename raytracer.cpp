@@ -411,11 +411,14 @@ Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Re
 					double x0,y0;
 					while(1)
 					{
-						x0 = (double)rand() / RAND_MAX * drefl;
-						y0 = (double)rand() / RAND_MAX * drefl;
-						if((x0 * x0 + y0 * y0) < (drefl * drefl))
+						x0 = 2.0 * (double)rand() / RAND_MAX - 1.0;
+						y0 = 2.0 * (double)rand() / RAND_MAX - 1.0;
+						//if((x0 * x0 + y0 * y0) < (drefl * drefl))
+						if((x0 * x0 + y0 * y0) < 1.0)
 							break;
 					}
+					x0 *= drefl;
+					y0 *= drefl;
 					vector3 newR = R + component1 * x0 + component2 * y0;
 					NORMALIZE( newR );
 					double dist;
@@ -468,7 +471,8 @@ Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Re
 //#define SUPERSAMPLING
 bool Engine::HYF_render(cv::Mat& colorim)
 {
-	vector3 o( 0, 0, -5 );
+	//vector3 o( 0, 0, -5 );
+	Camera c = Camera();
 	Primitive* lastprim = 0;
 	for ( int y = 0; y < m_Height; y++ )
 	{
@@ -481,9 +485,10 @@ bool Engine::HYF_render(cv::Mat& colorim)
 			for(double i = -1.0;i < 1.5;++i)
 				for(double j = -1.0;j < 1.5;++j)
 				{
-					vector3 dir = vector3( (1.0 * x + i / 3) / 100 - 4.0 , (1.0 * y + j / 3) / 100 - 3.0, 0 ) - o;
-					NORMALIZE( dir );
-					Ray r( o, dir );
+					//vector3 dir = vector3( (1.0 * x + i / 3) / 100 - 4.0 , (1.0 * y + j / 3) / 100 - 3.0, 0 ) - o;
+					//NORMALIZE( dir );
+					vector3 dir = c.getDir(x,y);
+					Ray r( c.getEye(), dir );
 					double dist;
 					Primitive* prim = Runtracer( r, col, 1, 1.0, dist );
 				}
@@ -493,9 +498,10 @@ bool Engine::HYF_render(cv::Mat& colorim)
 			//super sampling
 #endif
 #ifndef SUPERSAMPLING
-			vector3 dir = vector3( (1.0 * x) / 100 - 4.0 , (1.0 * y) / 100 - 3.0, 0 ) - o;
-			NORMALIZE( dir );
-			Ray r( o, dir );
+			//vector3 dir = vector3( (1.0 * x) / 100 - 4.0 , (1.0 * y) / 100 - 3.0, 0 ) - o;
+			//NORMALIZE( dir );
+			vector3 dir = c.getDir(x,y);
+			Ray r( c.getEye(), dir );
 			double dist;
 			Primitive* prim = Runtracer( r, col, 1, 1.0, dist );
 			int red = (int)(col.r * 256);
@@ -508,8 +514,8 @@ bool Engine::HYF_render(cv::Mat& colorim)
 			colorim.at<Vec3b>(m_Height - y - 1,x) = Vec3b(blue,green,red);
 		}
 		printf("rendering %dth row...\n",y+1);
-		//imshow("test",colorim);
-		//waitKey(0);
+		imshow("test",colorim);
+		waitKey(10);
 	}
 	return true;
 }

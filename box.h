@@ -9,7 +9,7 @@ namespace HYF
 class Box : public Primitive
 {
 public:
-	int getType() { return BOX; }
+	inline int getType() { return BOX; }
 	Box();
 	Box( BoundingBox& p_Box );
 	int Intersect( Ray& p_Ray, double& p_Dist );
@@ -18,7 +18,7 @@ public:
 	bool Contains( vector3& p_Pos ) { return m_Box.Contains( p_Pos ); }
 	vector3& getPos() { return m_Box.getPos(); }
 	vector3& getSize() { return m_Box.getSize(); }
-	BoundingBox getBoundingBox() { return m_Box; }
+	inline BoundingBox getBoundingBox() { return m_Box; }
 protected:
 	BoundingBox m_Box;
 };

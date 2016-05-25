@@ -10,20 +10,20 @@ class Material
 {
 public:
 	Material();
-	void setColor( Color& p_Color ) { m_Color = p_Color; }
-	Color getColor() { return m_Color; }
-	void setSpecular( double p_Spec ) { m_Spec = p_Spec; }//高光
-	void setDiffuse( double p_Diff ) { m_Diff = p_Diff; }
-	void setReflection( double p_Refl ) { m_Refl = p_Refl; }
-	void setDiffRefl(double p_DiffRefl ) { m_DiffRefl = p_DiffRefl; }
-	void setRefraction( double p_Refr ) { m_Refr = p_Refr; }
-	void setRefr_Rate( double p_Refr_Rate ) { m_Refr_Rate = p_Refr_Rate; }
-	double getSpecular() { return m_Spec; }//高光
-	double getDiffuse() { return m_Diff; }//漫反射
-	double getReflection() { return m_Refl;}
-	double getDiffRefl() { return m_DiffRefl;}
-	double getRefraction() { return m_Refr;}
-	double getRefr_Rate() { return m_Refr_Rate;}
+	inline void setColor( Color& p_Color ) { m_Color = p_Color; }
+	inline Color getColor() { return m_Color; }
+	inline void setSpecular( double p_Spec ) { m_Spec = p_Spec; }//高光
+	inline void setDiffuse( double p_Diff ) { m_Diff = p_Diff; }
+	inline void setReflection( double p_Refl ) { m_Refl = p_Refl; }
+	inline void setDiffRefl(double p_DiffRefl ) { m_DiffRefl = p_DiffRefl; }
+	inline void setRefraction( double p_Refr ) { m_Refr = p_Refr; }
+	inline void setRefr_Rate( double p_Refr_Rate ) { m_Refr_Rate = p_Refr_Rate; }
+	inline double getSpecular() { return m_Spec; }//高光
+	inline double getDiffuse() { return m_Diff; }//漫反射
+	inline double getReflection() { return m_Refl;}
+	inline double getDiffRefl() { return m_DiffRefl;}
+	inline double getRefraction() { return m_Refr;}
+	inline double getRefr_Rate() { return m_Refr_Rate;}
 private:
 	Color m_Color;//材质颜色
 	double m_Refl;//反射系数
@@ -44,8 +44,8 @@ public:
 		BOX = 3
 	};
 	Primitive() : m_Name( 0 ), m_Light( false ) {};
-	Material* getMaterial() { return &m_Material; }
-	void setMaterial( Material& p_Mat ) { m_Material = p_Mat; }
+	inline Material* getMaterial() { return &m_Material; }
+	inline void setMaterial( Material& p_Mat ) { m_Material = p_Mat; }
 
 	virtual int getType() = 0;
 	virtual int Intersect( Ray& p_Ray, double& p_Dist ) = 0;
@@ -55,9 +55,9 @@ public:
 	virtual void Light( bool p_Light ) { m_Light = p_Light; }
 	virtual BoundingBox getBoundingBox() = 0;
 	
-	bool IsLight() { return m_Light; }
+	inline bool IsLight() { return m_Light; }
 	void setName( char* p_Name );
-	char* getName() { return m_Name; }
+	inline char* getName() { return m_Name; }
 protected:
 	Material m_Material;
 	char* m_Name;

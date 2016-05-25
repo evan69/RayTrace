@@ -12,12 +12,12 @@ public:
 	~Scene();
 	void init();
 	void BuildGrid();
-	std::vector<Primitive*>* getGrid() {return m_Grid;}
-	int getNrPrimitives() { return m_Primitives; }
-	int getNrLights() {return m_Lights;}
-	Primitive* getPrimitive( int p_Idx ) { return m_Primitive[p_Idx]; }
-	Primitive* getLight(int p_Idx) { return m_Light[p_Idx];}
-	BoundingBox& getBoundary() {return m_Boundary;}
+	inline std::vector<Primitive*>* getGrid() {return m_Grid;}
+	inline int getNrPrimitives() { return m_Primitives; }
+	inline int getNrLights() {return m_Lights;}
+	inline Primitive* getPrimitive( int p_Idx ) { return m_Primitive[p_Idx]; }
+	inline Primitive* getLight(int p_Idx) { return m_Light[p_Idx];}
+	inline BoundingBox& getBoundary() {return m_Boundary;}
 private:
 	int m_Primitives,m_Lights;
 	Primitive** m_Primitive,**m_Light;

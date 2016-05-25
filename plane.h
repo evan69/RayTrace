@@ -27,12 +27,12 @@ class PlanePrim : public Primitive
 public:
 	int getType() { return PLANE; }
 	PlanePrim( vector3& p_Normal, double p_D ) : m_Plane( plane( p_Normal, p_D ) ) {};
-	vector3& getNormal() { return m_Plane.N; }
-	double getD() { return m_Plane.D; }
+	inline vector3& getNormal() { return m_Plane.N; }
+	inline double getD() { return m_Plane.D; }
 	int Intersect( Ray& p_Ray, double& p_Dist );
 	bool H_IntersectBox( BoundingBox& );
-	vector3 getNormal( vector3& p_Pos ){return m_Plane.N;};
-	BoundingBox getBoundingBox() { return BoundingBox(vector3(-10000,-10000,-10000),vector3(20000,20000,20000));}
+	inline vector3 getNormal( vector3& p_Pos ){return m_Plane.N;};
+	inline BoundingBox getBoundingBox() { return BoundingBox(vector3(-10000,-10000,-10000),vector3(20000,20000,20000));}
 
 private:
 	plane m_Plane;

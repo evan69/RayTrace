@@ -13,7 +13,7 @@ public:
 	Engine();
 	~Engine();
 	void setTarget();
-	Scene* getScene() { return m_Scene; }
+	inline Scene* getScene() { return m_Scene; }
 	Primitive* Runtracer( Ray& p_Ray, Color& p_Acc, int p_Depth, double p_RIndex, double& p_Dist );
 	bool HYF_render(cv::Mat&);
 	double calShade(Primitive* p_Light, vector3 p_pi, vector3& p_Dir);
