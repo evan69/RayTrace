@@ -3,6 +3,18 @@
 namespace HYF
 {
 
+Color PlanePrim::getColor(vector3& p_Pos)
+{
+	if(m_Material.getTexure() == NULL)
+	{
+		return m_Material.getColor();
+	}
+	double u = DOT(p_Pos,x_Dir) * m_Material.getTexRatioDao();
+	double v = DOT(p_Pos,y_Dir) * m_Material.getTexRatioDao();
+	return m_Material.getTexure()->getUVColor(u,v);
+	//return m_Material.getColor();
+}
+
 int PlanePrim::Intersect( Ray& p_Ray, double& p_Dist )
 {
 	double d = DOT( m_Plane.N, p_Ray.getDirection() );

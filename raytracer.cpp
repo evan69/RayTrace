@@ -369,7 +369,8 @@ Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Re
 					{
 						double diff = dot * prim->getMaterial()->getDiffuse() * shade;
 						// add diffuse component to ray color
-						p_Col += diff * light->getMaterial()->getColor() * prim->getMaterial()->getColor();
+						//p_Col += diff * light->getMaterial()->getColor() * prim->getMaterial()->getColor();
+						p_Col += diff * light->getMaterial()->getColor() * prim->getColor(pi);					
 					}
 				}
 				// determine specular component
@@ -424,7 +425,8 @@ Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Re
 					double dist;
 					Color rcol( 0, 0, 0 );
 					Runtracer( Ray( pi + newR * EPS, newR ), rcol, p_Depth + 1, p_Refr_Rate, dist );
-					p_Col += refl * rcol * prim->getMaterial()->getColor() * (1.0 / (double)num);
+					//p_Col += refl * rcol * prim->getMaterial()->getColor() * (1.0 / (double)num);
+					p_Col += refl * rcol * prim->getColor(pi) * (1.0 / (double)num);
 				}
 			}
 			else if (p_Depth < TRACEDEPTH)//光滑镜面反射
@@ -432,7 +434,8 @@ Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Re
 				Color rcol( 0, 0, 0 );
 				double dist;
 				Runtracer( Ray( pi + R * EPS, R ), rcol, p_Depth + 1, p_Refr_Rate, dist );
-				p_Col += refl * rcol * prim->getMaterial()->getColor();
+				//p_Col += refl * rcol * prim->getMaterial()->getColor();
+				p_Col += refl * rcol * prim->getColor(pi);
 			}
 		}
 		//计算折射
@@ -459,7 +462,8 @@ Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Re
 				double cosr = sqrt(cosr2);
 				vector3 T = (V * (1/n)) + (cosi / n - sqrt( cosr2 )) * N;
 				Runtracer(Ray(pi + T * EPS , T),rcol,p_Depth + 1, tmp_Refr_rate,dist);
-				Color absorbance = prim->getMaterial()->getColor() * 0.15 * -dist;
+				//Color absorbance = prim->getMaterial()->getColor() * 0.15 * -dist;
+				Color absorbance = prim->getColor(pi) * 0.15 * -dist;
 				Color transparency = Color( exp( absorbance.r ), exp( absorbance.g ), exp( absorbance.b ) );
 				p_Col += rcol * transparency;
 			}

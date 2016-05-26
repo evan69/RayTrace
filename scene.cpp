@@ -8,8 +8,8 @@ Scene::~Scene()
 	delete m_Primitive;
 }
 
-#define SCENE_CORNELLBOX
-//#define SCENE_5
+//#define SCENE_CORNELLBOX
+#define SCENE_3
 void Scene::init()
 {
 	m_Primitive = 0;
@@ -64,6 +64,8 @@ void Scene::init()
 	m_Primitive[6]->getMaterial()->setSpecular( 0 );
 	m_Primitive[6]->getMaterial()->setDiffuse( 0.6 );
 	m_Primitive[6]->getMaterial()->setColor( Color( 0.5, 0.3, 0.5 ) );
+	m_Primitive[6]->getMaterial()->setTexure(new Texture( "textures/marble.tga" ));
+	m_Primitive[6]->getMaterial()->setTexRatio(2.0);
 	// ceiling plane
 	m_Primitive[7] = new PlanePrim( vector3( 0, -1, 0 ), 7.4f );
 	m_Primitive[7]->setName( "back plane" );
