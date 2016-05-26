@@ -29,7 +29,6 @@ public:
 	PlanePrim( vector3& p_Normal, double p_D ) : m_Plane( plane( p_Normal, p_D ) ) 
 	{
 		//x_Dir = vector3( m_Plane.N.y, m_Plane.N.z, -m_Plane.N.x );
-		
 		x_Dir = m_Plane.N.Cross(vector3(0,1,0));
 		y_Dir = x_Dir.Cross( m_Plane.N );
 		NORMALIZE(x_Dir);

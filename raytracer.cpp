@@ -206,7 +206,7 @@ testloop:
 	return retval;
 }
 
-double Engine::calShade(Primitive* p_Light, vector3 p_pi, vector3& p_Dir)
+double Engine::calShade(Primitive* p_Light, vector3 p_pi, vector3& p_Dir,double p_Sample,double p_SampleRange)
 {
 	
 	//vector3 delta = vector3();
@@ -244,12 +244,30 @@ double Engine::calShade(Primitive* p_Light, vector3 p_pi, vector3& p_Dir)
 	{
 		//printf("box\n");
 		shade = 0.0;
-		int max_X = 10,max_Z = 10;
+		//int max_X = 10,max_Z = 10;
 		Box* light = (Box*)p_Light;
 		vector3 P = light->getPos();
 		vector3 size = light->getSize();
 		p_Dir = P + 0.5 * size - p_pi;
 		NORMALIZE(p_Dir);
+		int n = (int)floor(sqrt(p_Sample + 0.5));
+		for(int i = 0;i < n;++i)
+			for(int j = 0;j < n;++j)
+			{
+				vector3 d = vector3(size.x / n,0.0,size.z / n);
+				//printf("%llf,%llf,%llf\n",d.x,d.y,d.z);
+				vector3 pos = P + vector3(d.x * (i + (double)rand() / RAND_MAX),0.0,d.z * (j + (double)rand() / RAND_MAX));
+				//monte carlo 
+				vector3 dir = pos - p_pi;
+				double dist = LENGTH(dir);
+				NORMALIZE(dir);
+				if (FindNearest( Ray( p_pi + dir * EPS, dir), dist, prim ))
+					if (prim == p_Light) 
+						//shade += (1.0 / (max_X * max_Z));
+						//shade += p_SampleRange;
+						shade += 1.0 / (n * n);
+			}
+		/*
 		for(int i = 0;i < max_X;++i)
 			for(int j = 0;j < max_Z;++j)
 			{
@@ -264,6 +282,7 @@ double Engine::calShade(Primitive* p_Light, vector3 p_pi, vector3& p_Dir)
 					if (prim == p_Light) 
 						shade += (1.0 / (max_X * max_Z));
 			}
+		*/
 		/*
 		shade = 0;
 		Box* b = (Box*)p_Light;
@@ -284,7 +303,8 @@ double Engine::calShade(Primitive* p_Light, vector3 p_pi, vector3& p_Dir)
 	return shade;
 }
 
-Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Refr_Rate, double& p_Dist )
+#define IMPORTANCE_SAMPLING
+Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Refr_Rate, double& p_Dist ,double p_Sample,double p_SampleRange)
 {
 	if (p_Depth > TRACEDEPTH) return 0;
 	// trace primary ray
@@ -357,7 +377,8 @@ Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Re
 				}
 				*/
 				vector3 L;
-				shade = calShade(light,pi,L);
+				//shade = calShade(light,pi,L);
+				shade = calShade(light,pi,L,p_Sample,p_SampleRange);
 				// calculate diffuse shading
 				//vector3 L = ((Sphere*)light)->getCentre() - pi;
 				//NORMALIZE( L );
@@ -400,7 +421,7 @@ Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Re
 			float drefl = prim->getMaterial()->getDiffRefl();
 			vector3 N = prim->getNormal( pi );
 			vector3 R = p_Ray.getDirection() - 2.0 * DOT( p_Ray.getDirection(), N ) * N;
-			if ((drefl > 0) && (p_Depth < 2))//´Ö²Ú¾µÃæ·´Éä
+			if ((drefl > 0) && (p_Depth < 3))//´Ö²Ú¾µÃæ·´Éä
 			{
 				vector3 component1 = vector3( R.z, 0.0, -R.x );
 				vector3 component2 = R.Cross( component1 );
@@ -424,7 +445,11 @@ Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Re
 					NORMALIZE( newR );
 					double dist;
 					Color rcol( 0, 0, 0 );
-					Runtracer( Ray( pi + newR * EPS, newR ), rcol, p_Depth + 1, p_Refr_Rate, dist );
+#ifdef IMPORTANCE_SAMPLING
+					Runtracer( Ray( pi + newR * EPS, newR ), rcol, p_Depth + 1, p_Refr_Rate, dist ,p_Sample * 0.25,p_SampleRange * 4.0);
+#else
+					Runtracer( Ray( pi + newR * EPS, newR ), rcol, p_Depth + 1, p_Refr_Rate, dist ,p_Sample,p_SampleRange);
+#endif
 					//p_Col += refl * rcol * prim->getMaterial()->getColor() * (1.0 / (double)num);
 					p_Col += refl * rcol * prim->getColor(pi) * (1.0 / (double)num);
 				}
@@ -433,7 +458,14 @@ Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Re
 			{
 				Color rcol( 0, 0, 0 );
 				double dist;
-				Runtracer( Ray( pi + R * EPS, R ), rcol, p_Depth + 1, p_Refr_Rate, dist );
+#ifdef IMPORTANCE_SAMPLING
+				//Runtracer( Ray( pi + newR * EPS, newR ), rcol, p_Depth + 1, p_Refr_Rate, dist ,p_Sample * 0.25,p_SampleRange * 4.0);
+				Runtracer( Ray( pi + R * EPS, R ), rcol, p_Depth + 1, p_Refr_Rate, dist ,p_Sample * 0.25,p_SampleRange * 4.0);
+#else
+				//Runtracer( Ray( pi + newR * EPS, newR ), rcol, p_Depth + 1, p_Refr_Rate, dist ,p_Sample,p_SampleRange);
+				Runtracer( Ray( pi + R * EPS, R ), rcol, p_Depth + 1, p_Refr_Rate, dist ,p_Sample,p_SampleRange);
+#endif
+				//Runtracer( Ray( pi + R * EPS, R ), rcol, p_Depth + 1, p_Refr_Rate, dist );
 				//p_Col += refl * rcol * prim->getMaterial()->getColor();
 				p_Col += refl * rcol * prim->getColor(pi);
 			}
@@ -461,7 +493,14 @@ Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Re
 				double sinr = sqrt(sinr2);
 				double cosr = sqrt(cosr2);
 				vector3 T = (V * (1/n)) + (cosi / n - sqrt( cosr2 )) * N;
-				Runtracer(Ray(pi + T * EPS , T),rcol,p_Depth + 1, tmp_Refr_rate,dist);
+#ifdef IMPORTANCE_SAMPLING
+				//Runtracer( Ray( pi + newR * EPS, newR ), rcol, p_Depth + 1, p_Refr_Rate, dist ,p_Sample * 0.25,p_SampleRange * 4.0);
+				Runtracer(Ray(pi + T * EPS , T),rcol,p_Depth + 1, tmp_Refr_rate,dist,p_Sample * 0.25,p_SampleRange * 4.0);
+#else
+				//Runtracer( Ray( pi + newR * EPS, newR ), rcol, p_Depth + 1, p_Refr_Rate, dist ,p_Sample,p_SampleRange);
+				Runtracer(Ray(pi + T * EPS , T),rcol,p_Depth + 1, tmp_Refr_rate,dist,p_Sample,p_SampleRange);
+#endif
+				//Runtracer(Ray(pi + T * EPS , T),rcol,p_Depth + 1, tmp_Refr_rate,dist);
 				//Color absorbance = prim->getMaterial()->getColor() * 0.15 * -dist;
 				Color absorbance = prim->getColor(pi) * 0.15 * -dist;
 				Color transparency = Color( exp( absorbance.r ), exp( absorbance.g ), exp( absorbance.b ) );
@@ -494,7 +533,8 @@ bool Engine::HYF_render(cv::Mat& colorim)
 					vector3 dir = c.getDir(x,y);
 					Ray r( c.getEye(), dir );
 					double dist;
-					Primitive* prim = Runtracer( r, col, 1, 1.0, dist );
+					//Primitive* prim = Runtracer( r, col, 1, 1.0, dist );
+					Primitive* prim = Runtracer( r, col, 1, 1.0, dist ,SAMPLES,(1.0 / SAMPLES));
 				}
 			int red = (int)(col.r * 256 / 9);
 			int green = (int)(col.g * 256 / 9);
@@ -507,7 +547,7 @@ bool Engine::HYF_render(cv::Mat& colorim)
 			vector3 dir = c.getDir(x,y);
 			Ray r( c.getEye(), dir );
 			double dist;
-			Primitive* prim = Runtracer( r, col, 1, 1.0, dist );
+			Primitive* prim = Runtracer( r, col, 1, 1.0, dist ,SAMPLES,(1.0 / SAMPLES));
 			int red = (int)(col.r * 256);
 			int green = (int)(col.g * 256);
 			int blue = (int)(col.b * 256);

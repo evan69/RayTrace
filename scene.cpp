@@ -25,21 +25,40 @@ void Scene::init()
 	// big sphere
 	m_Primitive[1] = new Sphere( vector3( 2, 0.8f, 3 ), 2.5f );
 	m_Primitive[1]->setName( "big sphere" );
+	/*
 	m_Primitive[1]->getMaterial()->setReflection( 0.2f );
 	m_Primitive[1]->getMaterial()->setRefraction( 0.8f );
 	m_Primitive[1]->getMaterial()->setRefr_Rate( 1.3f );
 	m_Primitive[1]->getMaterial()->setDiffuse( 0.1f );
 	m_Primitive[1]->getMaterial()->setSpecular( 0.9f );
 	m_Primitive[1]->getMaterial()->setColor( Color( 0.7f, 0.7f, 1.0 ) );
+	*/
+	m_Primitive[1]->getMaterial()->setReflection( 0.1f );
+	m_Primitive[1]->getMaterial()->setRefraction( 0.0f );
+	m_Primitive[1]->getMaterial()->setRefr_Rate( 1.3f );
+	m_Primitive[1]->getMaterial()->setDiffuse( 0.8f );
+	m_Primitive[1]->getMaterial()->setSpecular( 0.2f );
+	m_Primitive[1]->getMaterial()->setColor( Color( 0.7f, 0.7f, 1.0 ) );
+	m_Primitive[1]->getMaterial()->setTexure(new Texture("textures/marble.tga"));
 	// small sphere
+	
 	m_Primitive[2] = new Sphere( vector3( -5.5f, -0.5, 7 ), 2 );
 	m_Primitive[2]->setName( "small sphere" );
+	/*
 	m_Primitive[2]->getMaterial()->setReflection( 0.5 );
 	m_Primitive[2]->getMaterial()->setRefraction( 0.0 );
 	m_Primitive[2]->getMaterial()->setRefr_Rate( 1.3 );
 	m_Primitive[2]->getMaterial()->setDiffuse( 0.1 );
 	m_Primitive[2]->getMaterial()->setSpecular( 0.9 );
 	m_Primitive[2]->getMaterial()->setColor( Color( 0.7, 0.7, 1.0 ) );
+	*/
+	m_Primitive[2]->getMaterial()->setReflection( 0.1f );
+	m_Primitive[2]->getMaterial()->setRefraction( 0.0f );
+	m_Primitive[2]->getMaterial()->setRefr_Rate( 1.3f );
+	m_Primitive[2]->getMaterial()->setDiffuse( 0.8f );
+	m_Primitive[2]->getMaterial()->setSpecular( 0.2f );
+	m_Primitive[2]->getMaterial()->setColor( Color( 0.7f, 0.7f, 1.0 ) );
+	m_Primitive[2]->getMaterial()->setTexure(new Texture("textures/marble.tga"));
 	// light source 1
 	m_Primitive[3] = new Sphere( vector3( 0, 5, 5 ), 0.1 );
 	m_Primitive[3]->Light( true );
@@ -64,8 +83,8 @@ void Scene::init()
 	m_Primitive[6]->getMaterial()->setSpecular( 0 );
 	m_Primitive[6]->getMaterial()->setDiffuse( 0.6 );
 	m_Primitive[6]->getMaterial()->setColor( Color( 0.5, 0.3, 0.5 ) );
-	m_Primitive[6]->getMaterial()->setTexure(new Texture( "textures/marble.tga" ));
-	m_Primitive[6]->getMaterial()->setTexRatio(2.0);
+	m_Primitive[6]->getMaterial()->setTexure(new Texture( "textures/wood.tga" ));
+	m_Primitive[6]->getMaterial()->setTexRatio(5.0);
 	// ceiling plane
 	m_Primitive[7] = new PlanePrim( vector3( 0, -1, 0 ), 7.4f );
 	m_Primitive[7]->setName( "back plane" );

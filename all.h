@@ -32,6 +32,7 @@ namespace HYF
 #define GRIDSIZE		8
 #define GRIDSHFT		3
 #define MAXLIGHTS		10
+#define SAMPLES			128
 
 #define PI				3.141592653589793238462f
 

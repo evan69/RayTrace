@@ -12,6 +12,7 @@ public:
 	vector3& getCentre() { return m_Centre; }
 	double getRadius() { return m_Radius; }
 	double getSqRadius() { return m_SqRadius; }
+	Color getColor(vector3& p_Pos);
 	int Intersect( Ray& p_Ray, double& p_Dist );
 	bool H_IntersectBox(BoundingBox&);
 	inline vector3 getNormal( vector3& p_Pos ) { return (p_Pos - m_Centre) * m_RRadius; }
