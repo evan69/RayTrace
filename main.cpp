@@ -5,6 +5,7 @@ using std::string;
 
 Mat colorim(600,800,CV_8UC3);
 
+//#define OUTPUT
 int main()
 {
 	time_t start = clock();

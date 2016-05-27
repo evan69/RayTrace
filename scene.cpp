@@ -9,7 +9,7 @@ Scene::~Scene()
 }
 
 //#define SCENE_CORNELLBOX
-#define SCENE_3
+#define SCENE_4
 void Scene::init()
 {
 	m_Primitive = 0;

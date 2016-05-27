@@ -512,6 +512,7 @@ Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Re
 }
 
 //#define SUPERSAMPLING
+#define DEPTH_OF_FIELD
 bool Engine::HYF_render(cv::Mat& colorim)
 {
 	//vector3 o( 0, 0, -5 );
@@ -531,6 +532,7 @@ bool Engine::HYF_render(cv::Mat& colorim)
 					//vector3 dir = vector3( (1.0 * x + i / 3) / 100 - 4.0 , (1.0 * y + j / 3) / 100 - 3.0, 0 ) - o;
 					//NORMALIZE( dir );
 					vector3 dir = c.getDir(x,y);
+					NORMALIZE(dir);
 					Ray r( c.getEye(), dir );
 					double dist;
 					//Primitive* prim = Runtracer( r, col, 1, 1.0, dist );
@@ -545,9 +547,22 @@ bool Engine::HYF_render(cv::Mat& colorim)
 			//vector3 dir = vector3( (1.0 * x) / 100 - 4.0 , (1.0 * y) / 100 - 3.0, 0 ) - o;
 			//NORMALIZE( dir );
 			vector3 dir = c.getDir(x,y);
+			NORMALIZE(dir);
 			Ray r( c.getEye(), dir );
 			double dist;
 			Primitive* prim = Runtracer( r, col, 1, 1.0, dist ,SAMPLES,(1.0 / SAMPLES));
+#ifdef DEPTH_OF_FIELD
+			c.setRV(0.12,11.0);
+			for(int oo = 0;oo < 9;++oo)
+			{
+				//Color tmpCol(0.0,0.0,0.0);
+				//prim = Runtracer( c.getRandRay(x,y), tmpCol, 1, 1.0, dist ,SAMPLES,(1.0 / SAMPLES));
+				prim = Runtracer( c.getRandRay(x,y), col, 1, 1.0, dist ,SAMPLES,(1.0 / SAMPLES));
+				//prim = Runtracer( r, tmpCol, 1, 1.0, dist ,SAMPLES,(1.0 / SAMPLES));
+				//col += tmpCol;
+			}
+			col *= (1.0 / 10);
+#endif			
 			int red = (int)(col.r * 256);
 			int green = (int)(col.g * 256);
 			int blue = (int)(col.b * 256);

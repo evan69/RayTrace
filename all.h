@@ -67,8 +67,8 @@ typedef vector3 Color;
 
 };
 
-#include "camera.h"
 #include "ray.h"
+#include "camera.h"
 #include "primitive.h"
 #include "box.h"
 #include "sphere.h"
