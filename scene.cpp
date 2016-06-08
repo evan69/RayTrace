@@ -9,12 +9,12 @@ Scene::~Scene()
 }
 
 //#define SCENE_CORNELLBOX
-#define SCENE_4
+#define SCENE_3
 void Scene::init()
 {
 	m_Primitive = 0;
 #ifdef SCENE_3
-	m_Primitive = new Primitive*[100];
+	m_Primitive = new Primitive*[10000];
 	// ground plane
 	m_Primitive[0] = new PlanePrim( vector3( 0, 1, 0 ), 4.4f );
 	m_Primitive[0]->setName( "plane" );
@@ -23,7 +23,9 @@ void Scene::init()
 	m_Primitive[0]->getMaterial()->setDiffuse( 1.0 );
 	m_Primitive[0]->getMaterial()->setColor( Color( 0.4f, 0.3f, 0.3f ) );
 	// big sphere
-	m_Primitive[1] = new Sphere( vector3( 2, 0.8f, 3 ), 2.5f );
+	//m_Primitive[1] = new Sphere( vector3( 2, 0.8f, 3 ), 2.5f );
+	//m_Primitive[1] = new Triangle( vector3( 2, 0.8f, 1.0 ),  vector3( 2.5, 0.8f, 1.5 ) ,vector3( 2, 1.2, 1.2 ) );
+	m_Primitive[1] = new Triangle( vector3( 2, -1.8f, 3 ) ,vector3( -1.5, -3.8, 1 ) ,vector3( -5.5f, -0.5, 7 ));
 	m_Primitive[1]->setName( "big sphere" );
 	/*
 	m_Primitive[1]->getMaterial()->setReflection( 0.2f );
@@ -36,29 +38,20 @@ void Scene::init()
 	m_Primitive[1]->getMaterial()->setReflection( 0.1f );
 	m_Primitive[1]->getMaterial()->setRefraction( 0.0f );
 	m_Primitive[1]->getMaterial()->setRefr_Rate( 1.3f );
-	m_Primitive[1]->getMaterial()->setDiffuse( 0.8f );
-	m_Primitive[1]->getMaterial()->setSpecular( 0.2f );
-	m_Primitive[1]->getMaterial()->setColor( Color( 0.7f, 0.7f, 1.0 ) );
-	m_Primitive[1]->getMaterial()->setTexure(new Texture("textures/marble.tga"));
+	m_Primitive[1]->getMaterial()->setDiffuse( 1.0f );
+	m_Primitive[1]->getMaterial()->setSpecular( 0.1f );
+	m_Primitive[1]->getMaterial()->setColor( Color( 0.7f, 0.1f, 0.1f ) );
+	//m_Primitive[1]->Light(true);
+	//m_Primitive[1]->getMaterial()->setTexure(new Texture("textures/marble.tga"));
 	// small sphere
-	
 	m_Primitive[2] = new Sphere( vector3( -5.5f, -0.5, 7 ), 2 );
 	m_Primitive[2]->setName( "small sphere" );
-	/*
 	m_Primitive[2]->getMaterial()->setReflection( 0.5 );
 	m_Primitive[2]->getMaterial()->setRefraction( 0.0 );
 	m_Primitive[2]->getMaterial()->setRefr_Rate( 1.3 );
 	m_Primitive[2]->getMaterial()->setDiffuse( 0.1 );
 	m_Primitive[2]->getMaterial()->setSpecular( 0.9 );
 	m_Primitive[2]->getMaterial()->setColor( Color( 0.7, 0.7, 1.0 ) );
-	*/
-	m_Primitive[2]->getMaterial()->setReflection( 0.1f );
-	m_Primitive[2]->getMaterial()->setRefraction( 0.0f );
-	m_Primitive[2]->getMaterial()->setRefr_Rate( 1.3f );
-	m_Primitive[2]->getMaterial()->setDiffuse( 0.8f );
-	m_Primitive[2]->getMaterial()->setSpecular( 0.2f );
-	m_Primitive[2]->getMaterial()->setColor( Color( 0.7f, 0.7f, 1.0 ) );
-	m_Primitive[2]->getMaterial()->setTexure(new Texture("textures/marble.tga"));
 	// light source 1
 	m_Primitive[3] = new Sphere( vector3( 0, 5, 5 ), 0.1 );
 	m_Primitive[3]->Light( true );
@@ -76,7 +69,7 @@ void Scene::init()
 	m_Primitive[5]->getMaterial()->setSpecular( 0.9 );
 	m_Primitive[5]->getMaterial()->setColor( Color( 1.0, 0.4, 0.4 ) );
 	// back plane
-	m_Primitive[6] = new PlanePrim( vector3( 0.4f, 0, -1 ), 12 );
+	m_Primitive[6] = new PlanePrim( vector3( 0.4f, 0, -1 ), 20 );
 	m_Primitive[6]->setName( "back plane" );
 	m_Primitive[6]->getMaterial()->setReflection( 0.0 );
 	m_Primitive[6]->getMaterial()->setRefraction( 0.0 );
@@ -108,6 +101,10 @@ void Scene::init()
 	}
 	// set number of primitives
 	m_Primitives = prim;
+	Object dinosaur;
+	dinosaur.setInfo(vector3( 2, 0.8f, 3),0.05);
+	dinosaur.readin("dinosaur.obj",m_Primitive,m_Primitives);
+	std::cout << m_Primitives << std::endl;
 #endif
 
 #ifdef SCENE_4

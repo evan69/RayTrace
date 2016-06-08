@@ -64,7 +64,8 @@ public:
 	{
 		SPHERE = 1,
 		PLANE = 2,
-		BOX = 3
+		BOX = 3,
+		TRIANGLE = 4
 	};
 	Primitive() : m_Name( 0 ), m_Light( false ) {};
 	inline Material* getMaterial() { return &m_Material; }

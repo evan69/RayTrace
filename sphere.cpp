@@ -12,11 +12,6 @@ Color Sphere::getColor(vector3& p_Pos)
 	vector3 r_Pos = p_Pos - m_Centre;
 	double s = acos(r_Pos.z / m_Radius) / PI;
 	double t = acos(r_Pos.x / (m_Radius * sin(PI * s))) / PI;
-	if(r_Pos.y < 0) t += 0.5;
-	s /= (0.5 * m_Radius);
-	t /= (0.5 * m_Radius);
-	s = s - floor(s);
-	t = t - floor(s);
 	return m_Material.getTexure()->getUVColor(s,t);
 }
 

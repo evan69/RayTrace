@@ -29,10 +29,9 @@ namespace HYF
 
 #define EPS			0.0001f
 #define TRACEDEPTH		6
-#define GRIDSIZE		8
-#define GRIDSHFT		3
+#define GRIDSIZE		128
+#define GRIDSHFT		7
 #define MAXLIGHTS		10
-#define SAMPLES			128
 
 #define PI				3.141592653589793238462f
 
@@ -67,9 +66,11 @@ typedef vector3 Color;
 
 };
 
-#include "ray.h"
 #include "camera.h"
+#include "ray.h"
 #include "primitive.h"
+#include "triangle.h"
+#include "object.h"
 #include "box.h"
 #include "sphere.h"
 #include "plane.h"
