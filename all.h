@@ -12,7 +12,9 @@ typedef unsigned int Pixel;
 
 namespace HYF 
 {
-
+inline double clamp(double x){ return x<0 ? 0 : x>1 ? 1 : x; } 
+inline int toInt(double x){ return int(pow(clamp(x),1/2.2)*255+.5); } 
+inline double erand48(short unsigned int*){return (double)rand()/RAND_MAX;}
 //inline double Rand( double p_Range ) { return ((double)rand() / RAND_MAX) * p_Range; }
 
 #define HIT		 1		// Ray hit primitive
@@ -27,13 +29,24 @@ namespace HYF
 //#define SQRLENGTH(A)	(A.x*A.x+A.y*A.y+A.z*A.z)
 //#define SQRDISTANCE(A,B) ((A.x-B.x)*(A.x-B.x)+(A.y-B.y)*(A.y-B.y)+(A.z-B.z)*(A.z-B.z))
 
+#define PATHTRACING
+
 #define EPS			0.0001f
 #define TRACEDEPTH		6
-#define GRIDSIZE		128
-#define GRIDSHFT		7
+
+//#ifndef PATHTRACING
+#define GRIDSIZE		256
+#define GRIDSHFT		8
+//#else
+//#define GRIDSIZE		16
+//#define GRIDSHFT		4
+//#endif
+
 #define MAXLIGHTS		10
 
 #define PI				3.141592653589793238462f
+
+
 
 class BoundingBox
 {

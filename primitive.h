@@ -55,6 +55,12 @@ private:
 	Texture* m_Tex;
 	double m_TexRatio;//一块纹理的放大倍数
 	double m_TexRatioDao;//一块纹理的放大倍数的倒数
+
+//BRDF
+public:
+	enum Refl_t { DIFF, SPEC, REFR };
+	int BRDFType;
+	Color emission;
 };
 
 class Primitive
@@ -75,6 +81,7 @@ public:
 	virtual int Intersect( Ray& p_Ray, double& p_Dist ) = 0;
 	virtual bool H_IntersectBox( BoundingBox& ) = 0;
 	virtual vector3 getNormal( vector3& p_Pos ) = 0;
+	virtual vector3 getNormal( vector3& p_Pos ,vector3& p_RayO) {return getNormal(p_Pos);}
 	virtual Color getColor(vector3& p_Pos) { return m_Material.getColor(); }
 	virtual void Light( bool p_Light ) { m_Light = p_Light; }
 	virtual BoundingBox getBoundingBox() = 0;
@@ -86,11 +93,6 @@ protected:
 	Material m_Material;
 	char* m_Name;
 	bool m_Light;
-};
-
-class Round
-{
-	//to be added
 };
 
 }

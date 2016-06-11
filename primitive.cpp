@@ -4,7 +4,7 @@
 namespace HYF
 {
 
-	Texture::Texture( Color* p_Bitmap, int p_Width, int p_Height ) :
+Texture::Texture( Color* p_Bitmap, int p_Width, int p_Height ) :
 	m_Bitmap( p_Bitmap ),m_Width( p_Width ), m_Height( p_Height )
 {
 }

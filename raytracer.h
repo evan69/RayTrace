@@ -15,9 +15,11 @@ public:
 	void setTarget();
 	inline Scene* getScene() { return m_Scene; }
 	Primitive* Runtracer( Ray& p_Ray, Color& p_Acc, int p_Depth, double p_RIndex, double& p_Dist );
+	Color Runtracer(Ray &r, int depth, unsigned short *Xi);//Path Tracing
 	bool HYF_render(cv::Mat&);
 	double calShade(Primitive* p_Light, vector3 p_pi, vector3& p_Dir);
 	int FindNearest(Ray& p_Ray, double& p_Dist, Primitive*& p_Prim);
+	void PTintersect(Ray &r,double& t,Primitive* prim);
 protected:
 	Scene* m_Scene;
 	int m_Width, m_Height;

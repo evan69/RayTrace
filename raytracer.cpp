@@ -284,6 +284,10 @@ double Engine::calShade(Primitive* p_Light, vector3 p_pi, vector3& p_Dir)
 	return shade;
 }
 
+
+
+
+#ifndef PATHTRACING
 Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Refr_Rate, double& p_Dist )
 {
 	if (p_Depth > TRACEDEPTH) return 0;
@@ -451,6 +455,7 @@ Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Re
 				N = -1.0 * N;
 			}
 			double tmp_Refr_rate = prim->getMaterial()->getRefr_Rate();
+			if(result == INPRIM) tmp_Refr_rate = 1.0;
 			double n =  tmp_Refr_rate / p_Refr_Rate;//介质相对于空气的相对折射率
 			vector3 V = p_Ray.getDirection();
 			double cosi = -DOT( V, N);
@@ -523,5 +528,193 @@ bool Engine::HYF_render(cv::Mat& colorim)
 	}
 	return true;
 }
+
+#endif
+
+#ifdef PATHTRACING
+
+ /*
+ struct Vec {        // Usage: time ./smallpt 5000 && xv image.ppm 
+   double x, y, z;                  // position, also color (r,g,b) 
+   Vec(double x_=0, double y_=0, double z_=0){ x=x_; y=y_; z=z_; } 
+   Vec operator+(const Vec &b) const { return Vec(x+b.x,y+b.y,z+b.z); } 
+   Vec operator-(const Vec &b) const { return Vec(x-b.x,y-b.y,z-b.z); } 
+   Vec operator*(double b) const { return Vec(x*b,y*b,z*b); } 
+   Vec mult(const Vec &b) const { return Vec(x*b.x,y*b.y,z*b.z); } 
+   Vec& norm(){ return *this = *this * (1/sqrt(x*x+y*y+z*z)); } 
+   double dot(const Vec &b) const { return x*b.x+y*b.y+z*b.z; } // cross: 
+   Vec operator%(Vec&b){return Vec(y*b.z-z*b.y,z*b.x-x*b.z,x*b.y-y*b.x);} 
+ }; 
+ */
+ //struct Ray { Vec o, d; Ray(Vec o_, Vec d_) : o(o_), d(d_) {} }; 
+/*
+ enum Refl_t { DIFF, SPEC, REFR };  // material types, used in radiance() 
+ struct HSphere { 
+   double rad;       // radius 
+   vector3 p, e, c;      // position, emission, color 
+   Refl_t refl;      // reflection type (DIFFuse, SPECular, REFRactive) 
+   HSphere(double rad_, vector3 p_, vector3 e_, vector3 c_, Refl_t refl_): 
+     rad(rad_), p(p_), e(e_), c(c_), refl(refl_) {} 
+   
+   double intersect(Ray &r) const { // returns distance, 0 if nohit 
+	   vector3 op = p-r.getOrigin(); // Solve t^2*d.d + 2*t*(o-p).d + (o-p).(o-p)-R^2 = 0 
+	   double t, eps=1e-4, b=op.Dot(r.getDirection()), det=b*b-op.Dot(op)+rad*rad; 
+     if (det<0) return 0; else det=sqrt(det); 
+     return (t=b-det)>eps ? t : ((t=b+det)>eps ? t : 0); 
+   } 
+ }; 
+ 
+ HSphere HSpheres[] = {//Scene: radius, position, emission, color, material 
+   HSphere(1e5, vector3( 1e5+1,40.8,81.6), vector3(),vector3(.75,.25,.25),DIFF),//Left 
+   HSphere(1e5, vector3(-1e5+99,40.8,81.6),vector3(),vector3(.25,.25,.75),DIFF),//Rght 
+   HSphere(1e5, vector3(50,40.8, 1e5),     vector3(),vector3(.75,.75,.75),DIFF),//Back 
+   HSphere(1e5, vector3(50,40.8,-1e5+170), vector3(),vector3(),           DIFF),//Frnt 
+   HSphere(1e5, vector3(50, 1e5, 81.6),    vector3(),vector3(.75,.75,.75),DIFF),//Botm 
+   HSphere(1e5, vector3(50,-1e5+81.6,81.6),vector3(),vector3(.75,.75,.75),DIFF),//Top 
+   HSphere(16.5,vector3(27,16.5,47),       vector3(),vector3(1,1,1)*.999, SPEC),//Mirr 
+   HSphere(16.5,vector3(73,16.5,78),       vector3(),vector3(1,1,1)*.999, REFR),//Glas 
+   HSphere(600, vector3(50,681.6-.27,81.6),vector3(12,12,12),  vector3(), DIFF) //Lite 
+ }; 
+ */
+
+/*
+inline bool intersect(Ray &r, double &t, int &id)
+{ 
+	double n=sizeof(HSpheres)/sizeof(HSphere), d, inf=t=1e20; 
+	for(int i=int(n);i--;) 
+		if((d=HSpheres[i].intersect(r))&&d<t)
+		{
+			t=d;id=i;
+		}
+	return t<inf; 
+} 
+*/
+void Engine::PTintersect(Ray &r,double& t,Primitive* prim)
+{
+	for ( int s = 0; s < m_Scene->getNrPrimitives(); s++ )
+	{
+		Primitive* pr = m_Scene->getPrimitive( s );
+		//int res;
+		if (pr->Intersect( r, t )) 
+		{
+			prim = pr;
+			//result = res; // 0 = miss, 1 = hit, -1 = hit from inside primitive
+		}
+		//std::cout << res << "\n";
+	}
+}
+
+Color Engine::Runtracer(Ray &r, int depth, unsigned short *Xi)
+{ 
+	//std::cout << depth << "\n";
+	double t = 1e20;                         // distance to intersection 
+	//int id=0;                               // id of intersected object 
+	Primitive* prim = 0;
+	//int result;
+	//FindNearest(r,t,prim);
+	//std::cout << m_Scene->getNrPrimitives() << "\n";
+	//PTintersect(r,t,prim);
+	/*
+	for ( int s = 0; s < m_Scene->getNrPrimitives(); s++ )
+	{
+		Primitive* pr = m_Scene->getPrimitive( s );
+		int res;
+		if (res = pr->Intersect( r, t )) 
+		{
+			prim = pr;
+			//result = res; // 0 = miss, 1 = hit, -1 = hit from inside primitive
+		}
+	}
+	*/
+	FindNearest( r, t, prim );
+	//std::cout << t << std::endl;
+	if (prim == 0) {return vector3();} // if miss, return black 
+	//if (!intersect(r, t, id)) {return vector3();} // if miss, return black 
+
+	//const HSphere &obj = HSpheres[id];        // the hit object 
+	//vector3 x=r.getOrigin()+r.getDirection()*t, n=(x-obj.p).norm(), nl=n.Dot(r.getDirection())<0?n:n*-1, f=obj.c; 
+	
+	vector3 x=r.getOrigin()+r.getDirection()*t, n=prim->getNormal(x).norm(), nl=n.Dot(r.getDirection())<0?n:n*-1, f=prim->getMaterial()->getColor(); 
+	//std::cout << t << std::endl;
+	//std::cout << n.x << " " << n.y << " " << n.z << std::endl;
+	//special add
+	//vector3 x=r.getOrigin()+r.getDirection()*t;
+	//vector3 n=prim->getNormal(x,r.getOrigin());
+	//vector3 nl=n.Dot(r.getDirection())<0?n:n*-1, f=prim->getMaterial()->getColor(); 
+	
+	double p = f.x>f.y && f.x>f.z ? f.x : f.y>f.z ? f.y : f.z; // max refl 
+	if (++depth>5)	
+		if (erand48(Xi)<0.9*p) f=f*(1/p);
+		else 
+			return prim->getMaterial()->emission;
+		//else return obj.e; //R.R. 
+	if (prim->getMaterial()->BRDFType == Material::DIFF)
+	//if (obj.refl == DIFF)
+	{                  // Ideal DIFFUSE reflection 
+		double r1=2*PI*erand48(Xi), r2=erand48(Xi), r2s=sqrt(r2); 
+		vector3 w=nl, u=((fabs(w.x)>.1?vector3(0,1,0):vector3(1,0,0))%w).norm(), v=w%u; 
+		vector3 d = (u*cos(r1)*r2s + v*sin(r1)*r2s + w*sqrt(1-r2)).norm(); 
+		return prim->getMaterial()->emission + f.mult(Runtracer(Ray(x,d),depth,Xi)); 
+		//return obj.e + f.mult(Runtracer(Ray(x,d),depth,Xi)); 
+	} 
+	else if (prim->getMaterial()->BRDFType == Material::SPEC)         // Ideal SPECULAR reflection 
+		return prim->getMaterial()->emission + f.mult(Runtracer(Ray(x,r.getDirection()-n*2*n.Dot(r.getDirection())),depth,Xi)); 
+	Ray reflRay(x, r.getDirection()-n*2*n.Dot(r.getDirection()));     // Ideal dielectric REFRACTION 
+	bool into = n.Dot(nl)>0;                // Ray from outside going in? 
+	double nc=1, nt=1.5, nnt=into?nc/nt:nt/nc, ddn=r.getDirection().Dot(nl), cos2t; 
+	if ((cos2t=1-nnt*nnt*(1-ddn*ddn))<0)    // Total internal reflection 
+		return prim->getMaterial()->emission + f.mult(Runtracer(reflRay,depth,Xi)); 
+	vector3 tdir = (r.getDirection()*nnt - n*((into?1:-1)*(ddn*nnt+sqrt(cos2t)))).norm(); 
+	double a=nt-nc, b=nt+nc, R0=a*a/(b*b), c = 1-(into?-ddn:tdir.Dot(n)); 
+	double Re=R0+(1-R0)*c*c*c*c*c,Tr=1-Re,P=.25+.5*Re,RP=Re/P,TP=Tr/(1-P); 
+	return prim->getMaterial()->emission + f.mult(depth>2 ? (erand48(Xi)<P ?   // Russian roulette 
+		Runtracer(reflRay,depth,Xi)*RP:Runtracer(Ray(x,tdir),depth,Xi)*TP) : 
+		Runtracer(reflRay,depth,Xi)*Re+Runtracer(Ray(x,tdir),depth,Xi)*Tr); 
+} 
+
+bool Engine::HYF_render(cv::Mat& colorim)
+{
+	//int w=1024, h=768; //samps = argc==2 ? atoi(argv[1])/4 : 1; // # samples 
+	int w=800, h=600;
+	int samps = 10;
+	//cv::Mat colorim(h,w,CV_8UC3);
+	Ray cam(vector3(50,52,295.6), vector3(0,-0.042612,-1).norm()); // cam pos, dir 
+	vector3 cx=vector3(w*.5135/h,0,0), cy=(cx%cam.getDirection()).norm()*.5135, r, *c=new vector3[w*h]; 
+	//#pragma omp parallel for schedule(dynamic, 1) private(r)       // OpenMP 
+	for (int y=0; y<h; y++)
+	{// Loop over image rows 
+		//fprintf(stderr,"\rRendering (%d spp) %5.2f%%",samps*4,100.*y/(h-1)); 
+		printf("rendering %dth row...\n",y+1);
+		short unsigned int Xi[3]={0,0,y*y*y};
+		for (unsigned short x=0; x<w; x++)   // Loop cols 
+			for (int sy=0, i=(h-y-1)*w+x; sy<2; sy++)     // 2x2 subpixel rows 
+				for (int sx=0; sx<2; sx++, r=vector3())
+				{// 2x2 subpixel cols 
+					for (int s=0; s<samps; s++)
+					{ 
+						double r1=2*erand48(Xi), dx=r1<1 ? sqrt(r1)-1: 1-sqrt(2-r1); 
+						double r2=2*erand48(Xi), dy=r2<1 ? sqrt(r2)-1: 1-sqrt(2-r2); 
+						vector3 d = cx*( ( (sx+.5 + dx)/2 + x)/w - .5) + 
+							cy*( ( (sy+.5 + dy)/2 + y)/h - .5) + cam.getDirection(); 
+						r = r + Runtracer(Ray(cam.getOrigin()+d*140,d.norm()),0,Xi)*(1./samps); 
+					} // Camera rays are pushed ^^^^^ forward to start in interior 
+					c[i] = c[i] + vector3(clamp(r.x),clamp(r.y),clamp(r.z))*.25; 
+					colorim.at<cv::Vec3b>(h - y - 1,x) = cv::Vec3b(toInt(c[i].x), toInt(c[i].y), toInt(c[i].z));
+				} 
+		imshow("test",colorim);
+		waitKey(10);
+   } 
+   /*
+   for (int i=0; i<w*h; i++) 
+   {
+	   int y = i / w;
+	   int x = i - y * w;
+	colorim.at<cv::Vec3b>(y,x) = cv::Vec3b(toInt(c[i].x), toInt(c[i].y), toInt(c[i].z));
+   }
+   */
+	return true;
+} 
+
+#endif
 
 }; // namespace HYF

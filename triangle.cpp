@@ -18,17 +18,18 @@ int Triangle::Intersect(Ray& p_Ray, double& p_Dist)
 	vector3 Hu1 = vertex[0] + diru * DOT(diru,(vertex[2] - vertex[0]));
 	vector3 Hu2 = vertex[0] + diru * DOT(diru,(interPoint - vertex[0]));
 	u = (interPoint - Hu2).x / (vertex[2] - Hu1).x;
-	if(u < 0) return MISS;
+	if(u < -EPS) return MISS;
 
 	vector3 dirv = vertex[2] - vertex[0];
 	NORMALIZE(dirv);
 	vector3 Hv1 = vertex[0] + dirv * DOT(dirv,(vertex[1] - vertex[0]));
 	vector3 Hv2 = vertex[0] + dirv * DOT(dirv,(interPoint - vertex[0]));
 	v = (interPoint - Hv2).x / (vertex[1] - Hv1).x;
-	if(v < 0) return MISS;
+	if(v < -EPS) return MISS;
 
-	if(u+v > 1) return MISS;
-	p_Dist = distance;
+	if(u+v > 1.0+EPS) return MISS;
+	if(p_Dist > distance) p_Dist = distance;
+	else return MISS;
 	return HIT;
 }
 

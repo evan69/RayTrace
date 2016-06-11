@@ -19,6 +19,7 @@ int PlanePrim::Intersect( Ray& p_Ray, double& p_Dist )
 {
 	double d = DOT( m_Plane.N, p_Ray.getDirection() );
 	if (d != 0)
+	//if (d < EPS && d > -EPS)
 	{
 		double dist = -(DOT( m_Plane.N, p_Ray.getOrigin() ) + m_Plane.D) / d;
 		if (dist > 0)

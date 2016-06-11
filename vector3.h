@@ -16,6 +16,9 @@ public:
 	double SqrLength();
 	double Dot( vector3 p_V );
 	vector3 Cross( vector3 b );
+	vector3 mult(const vector3 &b);
+	vector3& norm();
+	vector3 operator%(vector3& b);
 	void operator += ( vector3& p_V );
 	void operator += ( vector3* p_V );
 	void operator -= ( vector3& p_V );

@@ -32,6 +32,21 @@ vector3 vector3::Cross( vector3 b )
 	return vector3( y * b.z - z * b.y, z * b.x - x * b.z, x * b.y - y * b.x ); 
 }
 
+vector3 vector3::mult(const vector3 &b)
+{ 
+	return vector3(x*b.x,y*b.y,z*b.z); 
+} 
+
+vector3& vector3::norm()
+{ 
+	return *this = *this * (1/sqrt(x*x+y*y+z*z)); 
+} 
+
+vector3 vector3::operator%(vector3& b)
+{
+	return vector3(y*b.z-z*b.y,z*b.x-x*b.z,x*b.y-y*b.x);
+} 
+
 void vector3::operator += ( vector3& p_V ) 
 { 
 	x += p_V.x; y += p_V.y; z += p_V.z; 
