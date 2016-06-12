@@ -2,6 +2,7 @@
 #define VECTOR3
 
 #include <cmath>
+#include <cassert>
 
 namespace HYF
 {
@@ -40,6 +41,16 @@ public:
 		struct { double r, g, b; };
 		//struct { double cell[3]; };
 	};
+	double& operator[](int i){
+		if(i == 0)
+			return x;
+		else if (i == 1)
+			return y;
+		else if (i == 2)
+			return z;
+		else 
+			assert(0);
+	}
 };
 
 }

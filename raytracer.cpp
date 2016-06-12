@@ -24,8 +24,103 @@ void Engine::setTarget()
 	m_CW = m_Scene->getBoundary().getSize() * (1.0f / GRIDSIZE);//单位gird长度
 }
 
+int Engine::findNearestKD(Ray& ray, double& p_Dist, Primitive*& p_Prim)
+{
+	bool is_light = false;
+	int in_out = 0;
+	//在场景中的所有物体中寻找最近的一个交点
+	/*
+	for (auto& it : scene.sphere_vec){
+		IntersectResult temp;
+		int re = it->intersect(ray, temp);
+		if (re){
+			if (temp.distance < result.distance){
+				result = temp;
+				in_out = re;
+			}
+		}
+	}
+	for (auto& it : scene.plane_vec){
+		IntersectResult temp;
+		int re = it->intersect(ray, temp);
+		if (re){
+			if (temp.distance < result.distance){
+				result = temp;
+				in_out = re;
+			}
+		}
+	}
+
+	for (auto& it : scene.plight_vec){
+		IntersectResult temp;
+		int re = (it->get()).intersect(ray, temp);
+		if (re){
+			if (temp.distance < result.distance){
+				is_light = true;
+				result = temp;
+				result.primi = it;
+				in_out = re;
+			}
+		}
+	}
+
+	for (auto& it : scene.blight_vec){
+		IntersectResult temp;
+		int re = (it->get()).intersect(ray, temp);
+		if (re){
+			if (temp.distance < result.distance){
+				is_light = true;
+				result = temp;
+				result.primi = it;
+				in_out = re;
+			}
+		}
+	}
+	*/
+	//double dist = 1e10;
+	p_Dist = INF;
+	for ( int s = 0; s < m_Scene->getNrPrimitives(); s++ )
+	{
+		Primitive* pr = m_Scene->getPrimitive( s );
+		int res;
+		if (res = pr->Intersect( ray, p_Dist )) 
+		{
+			p_Prim = pr;
+			//result = res; // 0 = miss, 1 = hit, -1 = hit from inside primitive
+		}
+	}
+	for (auto& it : m_Scene->poly_vec){
+		IntersectResult temp;
+		int re = it->intersect(ray, temp);
+		if (re){
+			if (temp.distance < p_Dist){
+				p_Dist = temp.distance;
+				p_Prim = temp.primi;
+				in_out = re;
+			}
+		}
+	}
+
+	//IntersectResult temp;
+	//int re = scene.root->intersect(ray, temp);
+	//if (re){
+	//	if (temp.distance < result.distance){
+	//		result = temp;
+	//		in_out = re;
+	//	}
+	//}
+
+	if(p_Dist > INF - 1)//没有相加的物体返回0
+		return 0;
+	else //相交了的话反映是内部还是外部
+		return in_out;
+}
+
 int Engine::FindNearest( Ray& p_Ray, double& p_Dist, Primitive*& p_Prim )
 {
+#ifdef KD
+	return findNearestKD(p_Ray,p_Dist,p_Prim);
+#endif
 	int retval = MISS;
 	vector3 raydir, curpos;
 	BoundingBox e = m_Scene->getBoundary();
@@ -644,7 +739,7 @@ Color Engine::Runtracer(Ray &r, int depth, unsigned short *Xi)
 	
 	double p = f.x>f.y && f.x>f.z ? f.x : f.y>f.z ? f.y : f.z; // max refl 
 	if (++depth>5)	
-		if (erand48(Xi)<0.9*p) f=f*(1/p);
+		if (erand48(Xi)<p) f=f*(1/p);
 		else 
 			return prim->getMaterial()->emission;
 		//else return obj.e; //R.R. 
@@ -676,7 +771,7 @@ bool Engine::HYF_render(cv::Mat& colorim)
 {
 	//int w=1024, h=768; //samps = argc==2 ? atoi(argv[1])/4 : 1; // # samples 
 	int w=800, h=600;
-	int samps = 3;
+	int samps = PTSAMP;
 	//cv::Mat colorim(h,w,CV_8UC3);
 	Ray cam(vector3(50,52,295.6), vector3(0,-0.042612,-1).norm()); // cam pos, dir 
 	vector3 cx=vector3(w*.5135/h,0,0), cy=(cx%cam.getDirection()).norm()*.5135, r, *c=new vector3[w*h]; 
@@ -701,8 +796,8 @@ bool Engine::HYF_render(cv::Mat& colorim)
 					c[i] = c[i] + vector3(clamp(r.x),clamp(r.y),clamp(r.z))*.25; 
 					colorim.at<cv::Vec3b>(h - y - 1,x) = cv::Vec3b(toInt(c[i].x), toInt(c[i].y), toInt(c[i].z));
 				} 
-		imshow("test",colorim);
-		waitKey(10);
+		cv::imshow("test",colorim);
+		cv::waitKey(10);
    } 
    /*
    for (int i=0; i<w*h; i++) 

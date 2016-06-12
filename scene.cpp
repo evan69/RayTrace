@@ -55,7 +55,7 @@ void Scene::init()
 	 m_Primitive[5]->getMaterial()->BRDFType = Material::DIFF;
    //HSphere(1e5, vector3(50,-1e5+81.6,81.6),vector3(),vector3(.75,.75,.75),DIFF),//Top 
 
-	   m_Primitive[6] = new Sphere( vector3(27,10,87), 10 );
+	   m_Primitive[6] = new Sphere( vector3(22,14,90), 14 );
 	 m_Primitive[6]->getMaterial()->emission = vector3();
 	 m_Primitive[6]->getMaterial()->setColor(vector3(1,1,1)*.999);
 	 m_Primitive[6]->getMaterial()->BRDFType = Material::SPEC;
@@ -65,21 +65,21 @@ void Scene::init()
 	 m_Primitive[7]->getMaterial()->setColor(vector3(0,0,0));
 	 m_Primitive[7]->getMaterial()->BRDFType = Material::DIFF;
    //HSphere(600, vector3(50,681.6-.27,81.6),vector3(12,12,12),  vector3(), DIFF) //Lite 
-	 /*
-	 m_Primitive[9] = new Triangle( vector3(73,16.5,78), vector3(73,16.5,78) , vector3(73,16.5,78));
-	 m_Primitive[9]->getMaterial()->emission = vector3();;
-	 m_Primitive[9]->getMaterial()->setColor(vector3(1,1,1)*.999);
-	 m_Primitive[9]->getMaterial()->BRDFType = Material::REFR;
-	 */
-	 m_Primitives = 8;
+	 
+	 m_Primitive[8] = new Sphere( vector3(83,10,96), 10);
+	 m_Primitive[8]->getMaterial()->emission = vector3();;
+	 m_Primitive[8]->getMaterial()->setColor(vector3(1,1,1)*.999);
+	 m_Primitive[8]->getMaterial()->BRDFType = Material::REFR;
+	 
+	 m_Primitives = 9;
 	 
 	Object dragon;
 	//dragon.setInfo(vector3(73,16.5,78),0.5);
 	dragon.setInfo(vector3(50,20,45),27.0);
-	dragon.readin("dragon.obj",m_Primitive,m_Primitives);
+	dragon.readin("dragon.obj",m_Primitive,m_Primitives,this->poly_vec);
 	
 	Material* m =  new Material;
-	m->setColor(Color(1.0,1.0,1.0) * 0.999);
+	m->setColor(Color(1.0,1.0,1.0) * 0.9);
 	m->emission = vector3(0,0,0);
 	m->BRDFType = Material::REFR;
 	dragon.setMaterial(m);
@@ -257,19 +257,81 @@ void Scene::init()
 	}
 	// set number of primitives
 	m_Primitives = prim;
-	Object dinosaur;
-	dinosaur.setInfo(vector3( 2, 0.8f, 3),0.05);
-	dinosaur.readin("dinosaur.obj",m_Primitive,m_Primitives);
-	Material* m =  new Material;
-	m->setColor(Color(0.5,0.5,0.5));
-	m->setDiffRefl(0.0);
-	m->setDiffuse(2.0);
-	m->setReflection(0.0);
-	m->setRefraction(0.0);
-	m->setRefr_Rate(1.5);
-	m->setSpecular(0.0);
-	dragon.setMaterial(m);
-	std::cout << m_Primitives << std::endl;
+	/*
+	m_Primitive = new Primitive*[100];
+	// ground plane
+	m_Primitive[0] = new PlanePrim( vector3( 0, 1, 0 ), 4.4f );
+	m_Primitive[0]->setName( "plane" );
+	m_Primitive[0]->getMaterial()->setReflection( 0.0 );
+	m_Primitive[0]->getMaterial()->setRefraction( 0.0);
+	m_Primitive[0]->getMaterial()->setDiffuse( 1.0 );
+	m_Primitive[0]->getMaterial()->setColor( Color( 0.4f, 0.3f, 0.3f ) );
+	// big sphere
+	m_Primitive[1] = new Sphere( vector3( 2, 0.8f, 3 ), 2.5f );
+	m_Primitive[1]->setName( "big sphere" );
+	m_Primitive[1]->getMaterial()->setReflection( 0.2f );
+	m_Primitive[1]->getMaterial()->setRefraction( 0.8f );
+	m_Primitive[1]->getMaterial()->setRefr_Rate( 1.3f );
+	m_Primitive[1]->getMaterial()->setDiffuse( 0.1f );
+	m_Primitive[1]->getMaterial()->setSpecular( 0.9f );
+	m_Primitive[1]->getMaterial()->setColor( Color( 0.7f, 0.7f, 1.0 ) );
+	// small sphere
+	m_Primitive[2] = new Sphere( vector3( -5.5f, -0.5, 7 ), 2 );
+	m_Primitive[2]->setName( "small sphere" );
+	m_Primitive[2]->getMaterial()->setReflection( 0.5 );
+	m_Primitive[2]->getMaterial()->setRefraction( 0.0 );
+	m_Primitive[2]->getMaterial()->setRefr_Rate( 1.3 );
+	m_Primitive[2]->getMaterial()->setDiffuse( 0.1 );
+	m_Primitive[2]->getMaterial()->setSpecular( 0.9 );
+	m_Primitive[2]->getMaterial()->setColor( Color( 0.7, 0.7, 1.0 ) );
+	// light source 1
+	m_Primitive[3] = new Sphere( vector3( 0, 5, 5 ), 0.1 );
+	m_Primitive[3]->Light( true );
+	m_Primitive[3]->getMaterial()->setColor( Color( 0.4, 0.4, 0.4 ) );
+	// light source 2
+	m_Primitive[4] = new Sphere( vector3( -3, 5, 1 ), 0.1 );
+	m_Primitive[4]->Light( true );
+	m_Primitive[4]->getMaterial()->setColor( Color( 0.6, 0.6, 0.8 ) );
+	// extra sphere
+	m_Primitive[5] = new Sphere( vector3( -1.5, -3.8, 1 ), 1.5 );
+	m_Primitive[5]->setName( "extra sphere" );
+	m_Primitive[5]->getMaterial()->setReflection( 0.0 );
+	m_Primitive[5]->getMaterial()->setRefraction( 0.8 );
+	m_Primitive[5]->getMaterial()->setDiffuse( 0.1 );
+	m_Primitive[5]->getMaterial()->setSpecular( 0.9 );
+	m_Primitive[5]->getMaterial()->setColor( Color( 1.0, 0.4, 0.4 ) );
+	// back plane
+	m_Primitive[6] = new PlanePrim( vector3( 0.4f, 0, -1 ), 12 );
+	m_Primitive[6]->setName( "back plane" );
+	m_Primitive[6]->getMaterial()->setReflection( 0.0 );
+	m_Primitive[6]->getMaterial()->setRefraction( 0.0 );
+	m_Primitive[6]->getMaterial()->setSpecular( 0 );
+	m_Primitive[6]->getMaterial()->setDiffuse( 0.6 );
+	m_Primitive[6]->getMaterial()->setColor( Color( 0.5, 0.3, 0.5 ) );
+	// ceiling plane
+	m_Primitive[7] = new PlanePrim( vector3( 0, -1, 0 ), 7.4f );
+	m_Primitive[7]->setName( "back plane" );
+	m_Primitive[7]->getMaterial()->setReflection( 0.0 );
+	m_Primitive[7]->getMaterial()->setRefraction( 0.0 );
+	m_Primitive[7]->getMaterial()->setSpecular( 0 );
+	m_Primitive[7]->getMaterial()->setDiffuse( 0.5 );
+	m_Primitive[7]->getMaterial()->setColor( Color( 0.4, 0.7, 0.7 ) );
+	// grid
+	int prim = 8;
+	for ( int x = 0; x < 8; x++ ) for ( int y = 0; y < 7; y++ )
+	{
+		m_Primitive[prim] = new Sphere( vector3( -4.5 + x * 1.5, -4.3 + y * 1.5, 10 ), 0.3 );
+		m_Primitive[prim]->setName( "grid sphere" );
+		m_Primitive[prim]->getMaterial()->setReflection( 0 );
+		m_Primitive[prim]->getMaterial()->setRefraction( 0 );
+		m_Primitive[prim]->getMaterial()->setSpecular( 0.6 );
+		m_Primitive[prim]->getMaterial()->setDiffuse( 0.6 );
+		m_Primitive[prim]->getMaterial()->setColor( Color( 0.3, 1.0, 0.4 ) );
+		prim++;
+	}
+	// set number of primitives
+	m_Primitives = prim;
+	*/
 #endif
 
 #ifdef SCENE_4
@@ -717,9 +779,9 @@ void Scene::init()
 	dragon.setMaterial(m);
 #endif
 
-//#ifndef PATHTRACING
+#ifndef KD
 	BuildGrid();
-//#endif
+#endif
 }
 
 void Scene::BuildGrid()

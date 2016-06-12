@@ -20,6 +20,22 @@ public:
 		N = -(B - A).Cross(C - B);
 		NORMALIZE(N);
 	}
+	double GetMinCoord(int coord){
+		double x0 = vertex[0][coord];
+		double x1 = vertex[1][coord];
+		double x2 = vertex[2][coord];
+		if (x0 < x1)
+			return (x0 < x2) ? x0 : x2;
+		return (x1 < x2) ? x1 : x2;
+	}
+	double GetMaxCoord(int coord) {
+		double x0 = vertex[0][coord];
+		double x1 = vertex[1][coord];
+		double x2 = vertex[2][coord];
+		if (x0 > x1)
+			return (x0 > x2) ? x0 : x2;
+		return (x1 > x2) ? x1 : x2;
+	}
 	int getType() {return TRIANGLE;}
 	int Intersect( Ray& p_Ray, double& p_Dist );
 	bool H_IntersectBox( BoundingBox& );

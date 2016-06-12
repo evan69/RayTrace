@@ -8,3 +8,4 @@
 2016.5.27 新增景深效果
 2016.6.9 新增三角形，obj文件（慢）
 2016.6.12 新增简单path tracing
+2016.6.12 新增path tracing下的obj以及kdtree，但ray tracing下kdtree尚有bug

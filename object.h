@@ -10,6 +10,8 @@ namespace HYF
 
 class Object;
 
+class TriangleTree;
+
 class ObjTriangle : public Triangle
 {
 public:
@@ -37,7 +39,7 @@ public:
 		m_move = p_move;
 		m_alpha = p_alpha;
 	}
-	void readin(char*,Primitive**,int&);
+	void readin(char*,Primitive**,int&,std::vector<TriangleTree*>&);
 	void setMaterial(Material*);
 };
 

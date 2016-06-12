@@ -18,6 +18,7 @@ public:
 	Color Runtracer(Ray &r, int depth, unsigned short *Xi);//Path Tracing
 	bool HYF_render(cv::Mat&);
 	double calShade(Primitive* p_Light, vector3 p_pi, vector3& p_Dir);
+	int findNearestKD(Ray& ray, double& p_Dist, Primitive*& p_Prim);
 	int FindNearest(Ray& p_Ray, double& p_Dist, Primitive*& p_Prim);
 	void PTintersect(Ray &r,double& t,Primitive* prim);
 protected:

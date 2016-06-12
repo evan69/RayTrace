@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <vector>
+#include <cassert>
 #include "vector3.h"
 
 typedef unsigned int Pixel;
@@ -30,6 +31,8 @@ inline double erand48(short unsigned int*){return (double)rand()/RAND_MAX;}
 //#define SQRDISTANCE(A,B) ((A.x-B.x)*(A.x-B.x)+(A.y-B.y)*(A.y-B.y)+(A.z-B.z)*(A.z-B.z))
 
 #define PATHTRACING
+#define PTSAMP 2
+#define KD
 
 #define EPS			0.0001f
 #define TRACEDEPTH		6
@@ -89,5 +92,6 @@ typedef vector3 Color;
 #include "plane.h"
 #include "scene.h"
 #include "raytracer.h"
+#include "kdTree.h"
 
 #endif
