@@ -676,7 +676,7 @@ bool Engine::HYF_render(cv::Mat& colorim)
 {
 	//int w=1024, h=768; //samps = argc==2 ? atoi(argv[1])/4 : 1; // # samples 
 	int w=800, h=600;
-	int samps = 10;
+	int samps = 3;
 	//cv::Mat colorim(h,w,CV_8UC3);
 	Ray cam(vector3(50,52,295.6), vector3(0,-0.042612,-1).norm()); // cam pos, dir 
 	vector3 cx=vector3(w*.5135/h,0,0), cy=(cx%cam.getDirection()).norm()*.5135, r, *c=new vector3[w*h]; 

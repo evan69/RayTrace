@@ -33,7 +33,7 @@ void Scene::init()
    
 	m_Primitive[2] = new Sphere( vector3(50,40.8, 1e5), 1e5 );
 	m_Primitive[2]->getMaterial()->emission = vector3();
-	m_Primitive[2]->getMaterial()->setColor(vector3(.75,.75,.75));
+	m_Primitive[2]->getMaterial()->setColor(vector3(.75,.75,.25));
 	m_Primitive[2]->getMaterial()->BRDFType = Material::DIFF;
 	//HSphere(1e5, vector3(50,40.8, 1e5),     vector3(),vector3(.75,.75,.75),DIFF),//Back 
 
@@ -79,9 +79,9 @@ void Scene::init()
 	dragon.readin("dragon.obj",m_Primitive,m_Primitives);
 	
 	Material* m =  new Material;
-	m->setColor(Color(0.5,0.5,0.5));
+	m->setColor(Color(1.0,1.0,1.0) * 0.999);
 	m->emission = vector3(0,0,0);
-	m->BRDFType = Material::DIFF;
+	m->BRDFType = Material::REFR;
 	dragon.setMaterial(m);
 	
 #endif

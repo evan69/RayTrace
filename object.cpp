@@ -150,6 +150,9 @@ void Object::setMaterial(Material* m)
 		TriangleVec[i]->getMaterial()->setRefraction(m->getRefraction());
 		TriangleVec[i]->getMaterial()->setRefr_Rate(m->getRefr_Rate());
 		TriangleVec[i]->getMaterial()->setSpecular(m->getSpecular());
+
+		TriangleVec[i]->getMaterial()->emission = m->emission;
+		TriangleVec[i]->getMaterial()->BRDFType = m->BRDFType;
 		
 		/*
 		TriangleVec[i]->getMaterial()->setColor(Color(0.5,0.5,0.5));
