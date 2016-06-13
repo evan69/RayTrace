@@ -103,7 +103,9 @@ void Object::readin(char* filename,Primitive** p_Prim,int& p_PrimNum,std::vector
 		{
 			//std::cout << "face:"; 
 			int tmp[3];
-			fin >> tmp[0] >> tmp[1] >> tmp[2];
+			//fin >> tmp[0] >> tmp[1] >> tmp[2];
+			//此处注意法向！！！
+			fin >> tmp[0] >> tmp[2] >> tmp[1];
 			//std::cout << tmp[0] << tmp[1] << tmp[2] << '\n'; 
 			ObjTriangle* tri = new ObjTriangle(PointList[tmp[0]],PointList[tmp[1]],PointList[tmp[2]]);
 			if(tri->getNormal().Length() < EPS) continue;

@@ -36,8 +36,11 @@ Texture::Texture( char* p_File )
 
 Color Texture::getUVColor(double p_u,double p_v)//对应于uv平面的坐标，不一定在0-1之间
 {
-	double tmp_u = p_u + 204800.0;
-	double tmp_v = p_v + 204800.0;
+	//double tmp_u = p_u + 204800.0;
+	//double tmp_v = p_v + 204800.0;
+	double tmp_u = p_u + 2048;
+	double tmp_v = p_v + 2048;
+	//std::cout << tmp_u << "\n";
 	assert(tmp_u > 0);
 	assert(tmp_v > 0);
 	double u_W = tmp_u * m_Width;

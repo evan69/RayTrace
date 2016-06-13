@@ -30,9 +30,13 @@ inline double erand48(short unsigned int*){return (double)rand()/RAND_MAX;}
 //#define SQRLENGTH(A)	(A.x*A.x+A.y*A.y+A.z*A.z)
 //#define SQRDISTANCE(A,B) ((A.x-B.x)*(A.x-B.x)+(A.y-B.y)*(A.y-B.y)+(A.z-B.z)*(A.z-B.z))
 
-#define PATHTRACING
+//#define PATHTRACING
 #define PTSAMP 2
 #define KD
+//#define DEPTH_OF_FIELD
+#define IMPORTANCE_SAMPLING
+//#define SUPERSAMPLING
+#define SAMPLES			128
 
 #define EPS			0.0001f
 #define TRACEDEPTH		6
@@ -82,8 +86,8 @@ typedef vector3 Color;
 
 };
 
-#include "camera.h"
 #include "ray.h"
+#include "camera.h"
 #include "primitive.h"
 #include "triangle.h"
 #include "object.h"

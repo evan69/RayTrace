@@ -86,6 +86,8 @@ int Engine::findNearestKD(Ray& ray, double& p_Dist, Primitive*& p_Prim)
 		if (res = pr->Intersect( ray, p_Dist )) 
 		{
 			p_Prim = pr;
+			in_out = res;
+			//std::cout << "intersect\n";
 			//result = res; // 0 = miss, 1 = hit, -1 = hit from inside primitive
 		}
 	}
@@ -301,12 +303,52 @@ testloop:
 	return retval;
 }
 
-double Engine::calShade(Primitive* p_Light, vector3 p_pi, vector3& p_Dir)
+double Engine::calShade(Primitive* p_Light, vector3 p_pi, vector3& p_Dir,double p_Sample,double p_SampleRange)
 {
-	
-	//vector3 delta = vector3();
 	double shade = 0.0;
 	Primitive* prim = 0;
+	if(p_Light->getType() == Primitive::SPHERE)
+	{
+		Sphere* light = (Sphere*)p_Light;
+		vector3 O = light->getCentre();
+		p_Dir = O - p_pi;
+		NORMALIZE(p_Dir);
+		double R = light->getRadius();
+		vector3 dir = O - p_pi;
+		double dist = LENGTH(dir);
+		NORMALIZE(dir);
+		if (FindNearest( Ray( p_pi + dir * EPS, dir), dist, prim ))
+			if (prim == p_Light) 
+				shade += 1.0;
+	}
+	else if(p_Light->getType() == Primitive::BOX)
+	{
+		shade = 0.0;
+		Box* light = (Box*)p_Light;
+		vector3 P = light->getPos();
+		vector3 size = light->getSize();
+		p_Dir = P + 0.5 * size - p_pi;
+		NORMALIZE(p_Dir);
+		int n = (int)floor(sqrt(p_Sample + 0.5));
+		for(int i = 0;i < n;++i)
+			for(int j = 0;j < n;++j)
+			{
+				vector3 d = vector3(size.x / n,0.0,size.z / n);
+				vector3 pos = P + vector3(d.x * (i + (double)rand() / RAND_MAX),0.0,d.z * (j + (double)rand() / RAND_MAX));
+				vector3 dir = pos - p_pi;
+				double dist = LENGTH(dir);
+				NORMALIZE(dir);
+				if (FindNearest( Ray( p_pi + dir * EPS, dir), dist, prim ))
+					if (prim == p_Light) 
+						shade += 1.0 / (n * n);
+			}
+	}
+	return shade;
+
+	//--------------------------------------------
+	//vector3 delta = vector3();
+	//double shade = 0.0;
+	//Primitive* prim = 0;
 	if(p_Light->getType() == Primitive::SPHERE)
 	{
 		//int max_R = 2,max_C = 1;
@@ -376,6 +418,8 @@ double Engine::calShade(Primitive* p_Light, vector3 p_pi, vector3& p_Dir)
 		*/
 	}
 	//printf("%llf\n",shade);
+	//return 1.0;
+	//for debug
 	return shade;
 }
 
@@ -383,7 +427,7 @@ double Engine::calShade(Primitive* p_Light, vector3 p_pi, vector3& p_Dir)
 
 
 #ifndef PATHTRACING
-Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Refr_Rate, double& p_Dist )
+Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Refr_Rate, double& p_Dist ,double p_Sample,double p_SampleRange)
 {
 	if (p_Depth > TRACEDEPTH) return 0;
 	// trace primary ray
@@ -404,10 +448,15 @@ Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Re
 		}
 	}
 	*/
+#ifndef KD
 	if (!(result = FindNearest( p_Ray, p_Dist, prim ))) return 0;
+#else
+	if (!(result = findNearestKD( p_Ray, p_Dist, prim ))) return 0;
+#endif
 	//计算一根光线Ray最近的交汇点和距离
 	// no hit, terminate ray
 	if (!prim) return 0;//光线不和任何物体相交
+	//std::cout << "PRIM!=0" << std::endl;
 	// handle intersection
 	if (prim->IsLight())//如果光线最近遇到光源，直接返回光源颜色
 	{
@@ -418,10 +467,13 @@ Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Re
 	}
 	else//否则，最近的是不发光物体
 	{
+		//std::cout << "is not light\n";
 		// determine color at point of intersection
 		pi = p_Ray.getOrigin() + p_Ray.getDirection() * p_Dist;//pi为光线与最近物体交汇的地方
+		//std::cout << pi.x << " " << pi.y << " " << pi.z << "\n";
 		// trace lights
 		//for ( int l = 0; l < m_Scene->getNrPrimitives(); l++ )//再次枚举所有物体
+		//std::cout << m_Scene->getNrLights() << "\n";
 		for(int l = 0;l < m_Scene->getNrLights() ;++l)
 		{
 			//Primitive* p = m_Scene->getPrimitive( l );
@@ -456,7 +508,7 @@ Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Re
 				}
 				*/
 				vector3 L;
-				shade = calShade(light,pi,L);
+				shade = calShade(light,pi,L,p_Sample,p_SampleRange);
 				// calculate diffuse shading
 				//vector3 L = ((Sphere*)light)->getCentre() - pi;
 				//NORMALIZE( L );
@@ -523,7 +575,11 @@ Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Re
 					NORMALIZE( newR );
 					double dist;
 					Color rcol( 0, 0, 0 );
-					Runtracer( Ray( pi + newR * EPS, newR ), rcol, p_Depth + 1, p_Refr_Rate, dist );
+#ifdef IMPORTANCE_SAMPLING
+					Runtracer( Ray( pi + newR * EPS, newR ), rcol, p_Depth + 1, p_Refr_Rate, dist ,p_Sample * 0.25,p_SampleRange * 4.0);
+#else
+					Runtracer( Ray( pi + newR * EPS, newR ), rcol, p_Depth + 1, p_Refr_Rate, dist ,p_Sample,p_SampleRange);
+#endif
 					//p_Col += refl * rcol * prim->getMaterial()->getColor() * (1.0 / (double)num);
 					p_Col += refl * rcol * prim->getColor(pi) * (1.0 / (double)num);
 				}
@@ -532,7 +588,13 @@ Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Re
 			{
 				Color rcol( 0, 0, 0 );
 				double dist;
-				Runtracer( Ray( pi + R * EPS, R ), rcol, p_Depth + 1, p_Refr_Rate, dist );
+#ifdef IMPORTANCE_SAMPLING
+				//Runtracer( Ray( pi + newR * EPS, newR ), rcol, p_Depth + 1, p_Refr_Rate, dist ,p_Sample * 0.25,p_SampleRange * 4.0);
+				Runtracer( Ray( pi + R * EPS, R ), rcol, p_Depth + 1, p_Refr_Rate, dist ,p_Sample * 0.25,p_SampleRange * 4.0);
+#else
+				//Runtracer( Ray( pi + newR * EPS, newR ), rcol, p_Depth + 1, p_Refr_Rate, dist ,p_Sample,p_SampleRange);
+				Runtracer( Ray( pi + R * EPS, R ), rcol, p_Depth + 1, p_Refr_Rate, dist ,p_Sample,p_SampleRange);
+#endif
 				//p_Col += refl * rcol * prim->getMaterial()->getColor();
 				p_Col += refl * rcol * prim->getColor(pi);
 			}
@@ -561,7 +623,13 @@ Primitive* Engine::Runtracer( Ray& p_Ray, Color& p_Col, int p_Depth, double p_Re
 				double sinr = sqrt(sinr2);
 				double cosr = sqrt(cosr2);
 				vector3 T = (V * (1/n)) + (cosi / n - sqrt( cosr2 )) * N;
-				Runtracer(Ray(pi + T * EPS , T),rcol,p_Depth + 1, tmp_Refr_rate,dist);
+#ifdef IMPORTANCE_SAMPLING
+				//Runtracer( Ray( pi + newR * EPS, newR ), rcol, p_Depth + 1, p_Refr_Rate, dist ,p_Sample * 0.25,p_SampleRange * 4.0);
+				Runtracer(Ray(pi + T * EPS , T),rcol,p_Depth + 1, tmp_Refr_rate,dist,p_Sample * 0.25,p_SampleRange * 4.0);
+#else
+				//Runtracer( Ray( pi + newR * EPS, newR ), rcol, p_Depth + 1, p_Refr_Rate, dist ,p_Sample,p_SampleRange);
+				Runtracer(Ray(pi + T * EPS , T),rcol,p_Depth + 1, tmp_Refr_rate,dist,p_Sample,p_SampleRange);
+#endif
 				//Color absorbance = prim->getMaterial()->getColor() * 0.15 * -dist;
 				Color absorbance = prim->getColor(pi) * 0.15 * -dist;
 				Color transparency = Color( exp( absorbance.r ), exp( absorbance.g ), exp( absorbance.b ) );
@@ -577,6 +645,7 @@ bool Engine::HYF_render(cv::Mat& colorim)
 {
 	//vector3 o( 0, 0, -5 );
 	Camera c = Camera();
+	//c.setRV(0.005,16);
 	Primitive* lastprim = 0;
 	for ( int y = 0; y < m_Height; y++ )
 	{
@@ -594,7 +663,7 @@ bool Engine::HYF_render(cv::Mat& colorim)
 					vector3 dir = c.getDir(x,y);
 					Ray r( c.getEye(), dir );
 					double dist;
-					Primitive* prim = Runtracer( r, col, 1, 1.0, dist );
+					Primitive* prim = Runtracer( r, col, 1, 1.0, dist ,SAMPLES,(1.0 / SAMPLES));
 				}
 			int red = (int)(col.r * 256 / 9);
 			int green = (int)(col.g * 256 / 9);
@@ -607,7 +676,19 @@ bool Engine::HYF_render(cv::Mat& colorim)
 			vector3 dir = c.getDir(x,y);
 			Ray r( c.getEye(), dir );
 			double dist;
-			Primitive* prim = Runtracer( r, col, 1, 1.0, dist );
+			Primitive* prim = Runtracer( r, col, 1, 1.0, dist ,SAMPLES,(1.0 / SAMPLES));
+#ifdef DEPTH_OF_FIELD
+			c.setRV(0.02,15.0);
+			for(int oo = 0;oo < 9;++oo)
+			{
+				//Color tmpCol(0.0,0.0,0.0);
+				//prim = Runtracer( c.getRandRay(x,y), tmpCol, 1, 1.0, dist ,SAMPLES,(1.0 / SAMPLES));
+				prim = Runtracer( c.getRandRay(x,y), col, 1, 1.0, dist ,SAMPLES,(1.0 / SAMPLES));
+				//prim = Runtracer( r, tmpCol, 1, 1.0, dist ,SAMPLES,(1.0 / SAMPLES));
+				//col += tmpCol;
+			}
+			col *= (1.0 / 10);
+#endif		
 			int red = (int)(col.r * 256);
 			int green = (int)(col.g * 256);
 			int blue = (int)(col.b * 256);
@@ -618,8 +699,8 @@ bool Engine::HYF_render(cv::Mat& colorim)
 			colorim.at<Vec3b>(m_Height - y - 1,x) = Vec3b(blue,green,red);
 		}
 		printf("rendering %dth row...\n",y+1);
-		imshow("test",colorim);
-		waitKey(10);
+		cv::imshow("test",colorim);
+		cv::waitKey(10);
 	}
 	return true;
 }
@@ -702,6 +783,7 @@ void Engine::PTintersect(Ray &r,double& t,Primitive* prim)
 Color Engine::Runtracer(Ray &r, int depth, unsigned short *Xi)
 { 
 	//std::cout << depth << "\n";
+	if(depth > 1400) return Color(0,0,0);
 	double t = 1e20;                         // distance to intersection 
 	//int id=0;                               // id of intersected object 
 	Primitive* prim = 0;
@@ -721,7 +803,11 @@ Color Engine::Runtracer(Ray &r, int depth, unsigned short *Xi)
 		}
 	}
 	*/
+#ifndef KD
 	FindNearest( r, t, prim );
+#else
+	findNearestKD(r,t,prim);
+#endif
 	//std::cout << t << std::endl;
 	if (prim == 0) {return vector3();} // if miss, return black 
 	//if (!intersect(r, t, id)) {return vector3();} // if miss, return black 
@@ -796,7 +882,9 @@ bool Engine::HYF_render(cv::Mat& colorim)
 					c[i] = c[i] + vector3(clamp(r.x),clamp(r.y),clamp(r.z))*.25; 
 					colorim.at<cv::Vec3b>(h - y - 1,x) = cv::Vec3b(toInt(c[i].x), toInt(c[i].y), toInt(c[i].z));
 				} 
-		cv::imshow("test",colorim);
+		//cv::imshow("test",colorim);
+		if(y == 100 || y == 200 || y == 300 || y == 400 || y == 500 || y == 600)
+			cv::imwrite("tmp.png",colorim);
 		cv::waitKey(10);
    } 
    /*

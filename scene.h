@@ -13,6 +13,7 @@ public:
 	~Scene();
 	void init();
 	void BuildGrid();
+	void initLight();
 	inline std::vector<Primitive*>* getGrid() {return m_Grid;}
 	inline int getNrPrimitives() { return m_Primitives; }
 	inline int getNrLights() {return m_Lights;}
