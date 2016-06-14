@@ -33,10 +33,10 @@ inline double erand48(short unsigned int*){return (double)rand()/RAND_MAX;}
 //#define PATHTRACING
 #define PTSAMP 2
 #define KD
-//#define DEPTH_OF_FIELD
+#define DEPTH_OF_FIELD
 #define IMPORTANCE_SAMPLING
 //#define SUPERSAMPLING
-#define SAMPLES			128
+#define SAMPLES			512
 
 #define EPS			0.0001f
 #define TRACEDEPTH		6

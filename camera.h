@@ -57,7 +57,7 @@ public:
 		m_y = m_x.Cross(dir);
 		NORMALIZE(m_y);
 		vector3 ret = dir + (x * m_Ratio - 0.5 * m_Width) * m_x + (y * m_Ratio - 0.5 * m_Height) * m_y;
-		NORMALIZE(ret);
+		//NORMALIZE(ret);
 		return ret;
 	}
 	inline void setRV(double p_R,double p_V){ m_R = p_R; m_V = p_V; }

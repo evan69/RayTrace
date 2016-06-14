@@ -17,6 +17,83 @@ void Scene::init()
 	m_Primitive = 0;
 #ifdef PATHTRACING
 #ifdef PT1
+		m_Primitive = new Primitive*[500000];
+ //Scene: radius, position, emission, color, material 
+	m_Primitive[0] = new Sphere( vector3( 1e5+1,40.8,81.6), 1e5 );
+	m_Primitive[0]->getMaterial()->emission = vector3();
+	m_Primitive[0]->getMaterial()->setColor(vector3(.75,.25,.25));
+	m_Primitive[0]->getMaterial()->BRDFType = Material::DIFF;
+	//HSphere(1e5, vector3( 1e5+1,40.8,81.6), vector3(),vector3(.75,.25,.25),DIFF),//Left 
+
+	m_Primitive[1] = new Sphere( vector3(-1e5+99,40.8,81.6), 1e5 );
+	m_Primitive[1]->getMaterial()->emission = vector3();
+	m_Primitive[1]->getMaterial()->setColor(vector3(.25,.25,.75));
+	m_Primitive[1]->getMaterial()->BRDFType = Material::DIFF;
+	//HSphere(1e5, vector3(-1e5+99,40.8,81.6),vector3(),vector3(.25,.25,.75),DIFF),//Rght 
+   
+	m_Primitive[2] = new Sphere( vector3(50,40.8, 1e5), 1e5 );
+	m_Primitive[2]->getMaterial()->emission = vector3();
+	m_Primitive[2]->getMaterial()->setColor(vector3(.75,.75,.25));
+	m_Primitive[2]->getMaterial()->BRDFType = Material::DIFF;
+	//HSphere(1e5, vector3(50,40.8, 1e5),     vector3(),vector3(.75,.75,.75),DIFF),//Back 
+
+	   m_Primitive[3] = new Sphere( vector3(50,40.8,-1e5+170), 1e5 );
+	 m_Primitive[3]->getMaterial()->emission = vector3();
+	 m_Primitive[3]->getMaterial()->setColor(vector3());
+	 m_Primitive[3]->getMaterial()->BRDFType = Material::DIFF;
+   //HSphere(1e5, vector3(50,40.8,-1e5+170), vector3(),vector3(),           DIFF),//Frnt 
+
+	   m_Primitive[4] = new Sphere( vector3(50, 1e5, 81.6), 1e5 );
+	 m_Primitive[4]->getMaterial()->emission = vector3();
+	 m_Primitive[4]->getMaterial()->setColor(vector3(.75,.75,.75));
+	 m_Primitive[4]->getMaterial()->BRDFType = Material::DIFF;
+   //HSphere(1e5, vector3(50, 1e5, 81.6),    vector3(),vector3(.75,.75,.75),DIFF),//Botm 
+
+	   m_Primitive[5] = new Sphere( vector3(50,-1e5+81.6,81.6), 1e5 );
+	 m_Primitive[5]->getMaterial()->emission = vector3();
+	 m_Primitive[5]->getMaterial()->setColor(vector3(.75,.75,.75));
+	 m_Primitive[5]->getMaterial()->BRDFType = Material::DIFF;
+   //HSphere(1e5, vector3(50,-1e5+81.6,81.6),vector3(),vector3(.75,.75,.75),DIFF),//Top 
+
+	   m_Primitive[6] = new Sphere( vector3(22,14,45), 14 );
+	 m_Primitive[6]->getMaterial()->emission = vector3();
+	 m_Primitive[6]->getMaterial()->setColor(vector3(1,1,1)*.999);
+	 m_Primitive[6]->getMaterial()->BRDFType = Material::SPEC;
+
+	   m_Primitive[7] = new Sphere( vector3(50,681.6-.27,81.6), 600 );
+	 m_Primitive[7]->getMaterial()->emission = vector3(12,12,12);
+	 m_Primitive[7]->getMaterial()->setColor(vector3(0,0,0));
+	 m_Primitive[7]->getMaterial()->BRDFType = Material::DIFF;
+   //HSphere(600, vector3(50,681.6-.27,81.6),vector3(12,12,12),  vector3(), DIFF) //Lite 
+	 
+	 m_Primitive[8] = new Sphere( vector3(87,10,96), 10);
+	 m_Primitive[8]->getMaterial()->emission = vector3();;
+	 m_Primitive[8]->getMaterial()->setColor(vector3(1,1,1)*.999);
+	 m_Primitive[8]->getMaterial()->BRDFType = Material::REFR;
+	 
+	 m_Primitives = 9;
+	
+	Object dragon;
+	//dragon.setInfo(vector3(73,16.5,78),0.5);
+	dragon.setInfo(vector3(65,20,70),28.0);
+	dragon.readin("dragon.obj",m_Primitive,m_Primitives,this->poly_vec);
+	Material* m =  new Material;
+	m->setColor(Color(1.0,1.0,1.0) * 0.9);
+	m->emission = vector3(0,0,0);
+	m->BRDFType = Material::REFR;
+	dragon.setMaterial(m);
+	
+	Object bunny;
+	bunny.setInfo(vector3( 25,-4.6,108),150.0);
+	bunny.readin("bunny.obj",m_Primitive,m_Primitives,this->poly_vec);
+	Material* mm =  new Material;
+	mm->setColor(Color(1.0,1.0,1.0) * 0.9);
+	//mm->setColor(Color(0.5,0.5,0.5));
+	mm->emission = vector3(0,0,0);
+	mm->BRDFType = Material::DIFF;
+	bunny.setMaterial(mm);
+#endif
+#ifdef PT2
 	m_Primitive = new Primitive*[500000];
  //Scene: radius, position, emission, color, material 
 	m_Primitive[0] = new Sphere( vector3( 1e5+1,40.8,81.6), 1e5 );
@@ -86,7 +163,7 @@ void Scene::init()
 	
 #endif
 
-#ifdef PT2
+#ifdef PT3
 	m_Primitive = new Primitive*[500000];
  //Scene: radius, position, emission, color, material 
 	m_Primitive[0] = new Sphere( vector3( 1e5+1,40.8,81.6), 1e5 );
@@ -822,7 +899,7 @@ void Scene::init()
 	m_Primitive[3]->getMaterial()->setSpecular( 0.2f );
 	m_Primitive[3]->getMaterial()->setColor( Color( 0.7f, 0.7f, 1.0f ) );
 	m_Primitive[3]->getMaterial()->setDiffRefl( 0.1f );
-#if 0
+#if 1
 	// area light
 	m_Primitive[4] = new Box( BoundingBox( vector3( -1, 4.8, 4 ), vector3( 2, 0.01f, 2 ) ) );
 	m_Primitive[4]->Light( true );
