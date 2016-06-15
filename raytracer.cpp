@@ -660,7 +660,8 @@ bool Engine::HYF_render(cv::Mat& colorim)
 				{
 					//vector3 dir = vector3( (1.0 * x + i / 3) / 100 - 4.0 , (1.0 * y + j / 3) / 100 - 3.0, 0 ) - o;
 					//NORMALIZE( dir );
-					vector3 dir = c.getDir(x,y);
+					//vector3 dir = c.getDir(x,y);
+					vector3 dir = c.getDir(x + i / 3,y + j / 3);
 					NORMALIZE(dir);
 					Ray r( c.getEye(), dir );
 					double dist;
@@ -680,7 +681,7 @@ bool Engine::HYF_render(cv::Mat& colorim)
 			double dist;
 			Primitive* prim = Runtracer( r, col, 1, 1.0, dist ,SAMPLES,(1.0 / SAMPLES));
 #ifdef DEPTH_OF_FIELD
-			c.setRV(0.1,9.0);
+			c.setRV(0.18,14.0);
 			for(int oo = 0;oo < 9;++oo)
 			{
 				//Color tmpCol(0.0,0.0,0.0);
