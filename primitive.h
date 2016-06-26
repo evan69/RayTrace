@@ -56,7 +56,6 @@ private:
 	double m_TexRatio;//一块纹理的放大倍数
 	double m_TexRatioDao;//一块纹理的放大倍数的倒数
 
-//BRDF
 public:
 	enum Refl_t { DIFF, SPEC, REFR };
 	int BRDFType;

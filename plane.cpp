@@ -11,7 +11,6 @@ Color PlanePrim::getColor(vector3& p_Pos)
 	}
 	double u = DOT(p_Pos,x_Dir) * m_Material.getTexRatioDao();
 	double v = DOT(p_Pos,y_Dir) * m_Material.getTexRatioDao();
-	//std::cout << u << " " << v << std::endl;
 	return m_Material.getTexure()->getUVColor(u,v);
 	//return m_Material.getColor();
 }

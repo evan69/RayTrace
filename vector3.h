@@ -39,7 +39,6 @@ public:
 	{
 		struct { double x, y, z; };
 		struct { double r, g, b; };
-		//struct { double cell[3]; };
 	};
 	double& operator[](int i){
 		if(i == 0)

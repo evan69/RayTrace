@@ -16,8 +16,6 @@ class ObjTriangle : public Triangle
 {
 public:
 	ObjTriangle(vector3 A,vector3 B,vector3 C):Triangle(A,B,C){}
-	//ObjTriangle* EdgeNeighbor[3];
-	//vector<ObjTriangle*> VertexNeighbor[3];
 	int vertexIndex[3];
 	int id;
 	Object* obj;

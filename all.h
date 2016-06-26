@@ -13,25 +13,23 @@ typedef unsigned int Pixel;
 
 namespace HYF 
 {
+
 inline double clamp(double x){ return x<0 ? 0 : x>1 ? 1 : x; } 
 inline int toInt(double x){ return int(pow(clamp(x),1/2.2)*255+.5); } 
 inline double erand48(short unsigned int*){return (double)rand()/RAND_MAX;}
-//inline double Rand( double p_Range ) { return ((double)rand() / RAND_MAX) * p_Range; }
 
-#define HIT		 1		// Ray hit primitive
-#define MISS	 0		// Ray missed primitive
-#define INPRIM	-1		// Ray started inside primitive
+#define HIT		 1		//hit
+#define MISS	 0		//missed
+#define INPRIM	-1		//inside
 
 #define AIR_REFR_INDEX 1.0
 
 #define DOT(A,B)		(A.x*B.x+A.y*B.y+A.z*B.z)
 #define NORMALIZE(A)	{double l=1/sqrt(A.x*A.x+A.y*A.y+A.z*A.z);A.x*=l;A.y*=l;A.z*=l;}
 #define LENGTH(A)		(sqrt(A.x*A.x+A.y*A.y+A.z*A.z))
-//#define SQRLENGTH(A)	(A.x*A.x+A.y*A.y+A.z*A.z)
-//#define SQRDISTANCE(A,B) ((A.x-B.x)*(A.x-B.x)+(A.y-B.y)*(A.y-B.y)+(A.z-B.z)*(A.z-B.z))
 
 //#define PATHTRACING
-#define PTSAMP 2
+#define PTSAMP 5
 #define KD
 #define DEPTH_OF_FIELD
 #define IMPORTANCE_SAMPLING
@@ -41,19 +39,12 @@ inline double erand48(short unsigned int*){return (double)rand()/RAND_MAX;}
 #define EPS			0.0001f
 #define TRACEDEPTH		6
 
-//#ifndef PATHTRACING
 #define GRIDSIZE		256
 #define GRIDSHFT		8
-//#else
-//#define GRIDSIZE		16
-//#define GRIDSHFT		4
-//#endif
 
 #define MAXLIGHTS		10
 
 #define PI				3.141592653589793238462f
-
-
 
 class BoundingBox
 {
@@ -67,9 +58,9 @@ public:
 	{
 		vector3 v1 = b2.getPos(), v2 = b2.getPos() + b2.getSize();
 		vector3 v3 = m_Pos, v4 = m_Pos + m_Size;
-		return ((v4.x > v1.x) && (v3.x < v2.x) && // x-axis overlap
-				(v4.y > v1.y) && (v3.y < v2.y) && // y-axis overlap
-				(v4.z > v1.z) && (v3.z < v2.z));   // z-axis overlap
+		return ((v4.x > v1.x) && (v3.x < v2.x) &&
+				(v4.y > v1.y) && (v3.y < v2.y) &&
+				(v4.z > v1.z) && (v3.z < v2.z));
 	}
 	bool Contains( vector3 p_Pos )
 	{

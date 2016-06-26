@@ -18,18 +18,6 @@ public:
 	inline vector3 getNormal( vector3& p_Pos ) { return (p_Pos - m_Centre) * m_RRadius; }
 	inline vector3 getNormal( vector3& p_Pos ,vector3& p_RayO ) 
 	{
-		/*
-		if((p_RayO - m_Centre).SqrLength() >= m_SqRadius)
-		{
-			//std::cout << "out sphere\n";
-			return getNormal(p_Pos); 
-		}
-		else
-		{
-			//std::cout << "in sphere\n";
-			return -getNormal(p_Pos);
-		}
-		*/
 		vector3 ret = p_Pos - m_Centre;
 		return ret;
 	}

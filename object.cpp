@@ -103,8 +103,6 @@ void Object::readin(char* filename,Primitive** p_Prim,int& p_PrimNum,std::vector
 		{
 			//std::cout << "face:"; 
 			int tmp[3];
-			//fin >> tmp[0] >> tmp[1] >> tmp[2];
-			//此处注意法向！！！
 			fin >> tmp[0] >> tmp[2] >> tmp[1];
 			//std::cout << tmp[0] << tmp[1] << tmp[2] << '\n'; 
 			ObjTriangle* tri = new ObjTriangle(PointList[tmp[0]],PointList[tmp[1]],PointList[tmp[2]]);
@@ -116,32 +114,6 @@ void Object::readin(char* filename,Primitive** p_Prim,int& p_PrimNum,std::vector
 #else
 			tri_vec.push_back(tri);
 #endif
-			/*
-			tri->id = cnt;
-			TriangleInfo[tmp[0]].push_back(cnt);
-			TriangleInfo[tmp[1]].push_back(cnt);
-			TriangleInfo[tmp[2]].push_back(cnt);
-			TriangleVec.push_back(tri);
-			*/
-			//tri->allTriangle = &TriangleVec;
-			/*
-			tri->obj = this;
-			tri->vertexIndex[0] = tmp[0];
-			tri->vertexIndex[1] = tmp[1];
-			tri->vertexIndex[2] = tmp[2];
-			*/
-			/*
-			p_Prim[p_PrimNum]->getMaterial()->setColor(Color(0.5,0.5,0.5));
-			p_Prim[p_PrimNum]->getMaterial()->setDiffRefl(0.0);
-			p_Prim[p_PrimNum]->getMaterial()->setDiffuse(2.0);
-			p_Prim[p_PrimNum]->getMaterial()->setReflection(0.0);
-			p_Prim[p_PrimNum]->getMaterial()->setRefraction(0.0);
-			p_Prim[p_PrimNum]->getMaterial()->setRefr_Rate(1.4);
-			p_Prim[p_PrimNum]->getMaterial()->setSpecular(0.0);
-			*/
-			//TriangleVec.push_back(tri);
-			
-			//cnt++;
 		}
 	}
 #ifndef KD 
@@ -159,11 +131,7 @@ void Object::readin(char* filename,Primitive** p_Prim,int& p_PrimNum,std::vector
 	}
 	tree->BuildTree();
 	poly_vec.push_back(tree);
-	//tri_vec.clear();
 #endif
-	//std::cout << TriangleVec.size() << '\n';
-	//std::cout << TriangleInfo.size() << '\n';
-	
 }
 
 void Object::setMaterial(Material* m)
@@ -181,16 +149,6 @@ void Object::setMaterial(Material* m)
 
 		TriangleVec[i]->getMaterial()->emission = m->emission;
 		TriangleVec[i]->getMaterial()->BRDFType = m->BRDFType;
-		
-		/*
-		TriangleVec[i]->getMaterial()->setColor(Color(0.5,0.5,0.5));
-		TriangleVec[i]->getMaterial()->setDiffRefl(0.0);
-		TriangleVec[i]->getMaterial()->setDiffuse(2.0);
-		TriangleVec[i]->getMaterial()->setReflection(0.0);
-		TriangleVec[i]->getMaterial()->setRefraction(0.0);
-		TriangleVec[i]->getMaterial()->setRefr_Rate(1.5);
-		TriangleVec[i]->getMaterial()->setSpecular(0.0);
-		*/
 	}
 }
 

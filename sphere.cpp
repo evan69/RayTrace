@@ -46,55 +46,7 @@ int Sphere::Intersect( Ray& p_Ray, double& p_Dist )
 			}
 		}
 	}
-	/*
-	if(p_Dist < EPS)
-	{
-		std::cout << b << " " << det << "\n";
-		std::cout << p_Dist << "\n";
-		system("pause");
-	}
-	*/
 	return retval;
-	
-	/*
-	vector3 op = m_Centre-p_Ray.getOrigin(); // Solve t^2*d.d + 2*t*(o-p).d + (o-p).(o-p)-R^2 = 0 
-	double t, eps=1e-4, b=op.Dot(p_Ray.getDirection()), det=b*b-op.Dot(op)+m_SqRadius; 
-     if (det<0) 
-		 return 0; 
-	 else 
-		 det=sqrt(det); 
-     (t=b-det)>eps ? t : ((t=b+det)>eps ? t : 0); 
-	 p_Dist = t;
-	 return 1;
-	 */
-	/*
-	vector3 op = m_Centre-p_Ray.getOrigin(); // Solve t^2*d.d + 2*t*(o-p).d + (o-p).(o-p)-R^2 = 0 
-	double t, eps=1e-4, b=op.Dot(p_Ray.getDirection()), det=b*b-op.Dot(op)+m_Radius*m_Radius; 
-     if (det<0) 
-		 return 0;
-	 else 
-		 det=sqrt(det); 
-	//double ret = ((t=b-det)>eps ? t : ((t=b+det)>eps ? t : 0)); 
-	 double ret;// = ((t=b-det)>eps ? t : ((t=b+det)>eps ? t : 0)); 
-	 t=b-det;
-	 if(t > eps)
-	 {
-		 ret = t;
-	 }
-	 else
-	 {
-		 t = b+det;
-		 if(t > eps)
-		 {
-			 ret = t;
-		 }
-		 else
-			 ret = 0.0;
-	 }
-	if(ret < eps) return 0;
-	if(p_Dist > ret) p_Dist = ret;
-	return 1;
-	*/
 }
 
 
